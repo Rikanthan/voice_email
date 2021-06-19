@@ -13,6 +13,7 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -21,6 +22,7 @@ public class RegisterActivity extends AppCompatActivity {
     TextView login;
     boolean isNameValid, isEmailValid, isPhoneValid, isPasswordValid;
     TextInputLayout nameError, emailError, phoneError, passError;
+    FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
         emailError = (TextInputLayout) findViewById(R.id.emailError);
         phoneError = (TextInputLayout) findViewById(R.id.phoneError);
         passError = (TextInputLayout) findViewById(R.id.passError);
-
+        firebaseAuth = FirebaseAuth.getInstance();
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,6 +101,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (isNameValid && isEmailValid && isPhoneValid && isPasswordValid) {
+            firebaseAuth.createUserWithEmailAndPassword(email.getText().toString().trim(),password.toString().trim());
             Toast.makeText(getApplicationContext(), "Successfully", Toast.LENGTH_SHORT).show();
         }
 

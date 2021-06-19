@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "327175044460",
+    "project_id": "voice-email-399ef",
+    "storage_bucket": "voice-email-399ef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:327175044460:android:906953bbbefba71ae18749",
+        "android_client_info": {
+          "package_name": "com.example.i_email"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "327175044460-jd2qmq85d6ipfau1n7u7qqfsjihaiao2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCB_YcBXAjyC8aBuUE8K0AtSw7rt0ujn5Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "327175044460-jd2qmq85d6ipfau1n7u7qqfsjihaiao2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
