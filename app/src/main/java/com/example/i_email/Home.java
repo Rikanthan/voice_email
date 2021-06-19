@@ -18,10 +18,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class Home extends AppCompatActivity {
+    FirebaseAuth firebaseAuth;
+    DatabaseReference reff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +39,9 @@ public class Home extends AppCompatActivity {
 
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
 
-
+        firebaseAuth = FirebaseAuth.getInstance();
+        String uid= firebaseAuth.getUid();
+        reff= FirebaseDatabase.getInstance().getReference().child(uid);
         final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -64,7 +72,7 @@ public class Home extends AppCompatActivity {
 
             @Override
             public void onEndOfSpeech() {
-
+                reff.child("SentBox").setValue(editText.getText().toString().trim());
             }
 
             @Override
@@ -81,6 +89,7 @@ public class Home extends AppCompatActivity {
                 //displaying the first match
                 if (matches != null)
                     editText.setText(matches.get(0));
+                reff.child("SentBox").setValue(matches.get(0));
             }
 
             @Override
@@ -101,12 +110,14 @@ public class Home extends AppCompatActivity {
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
                         editText.setHint("You will see input here");
+
                         break;
 
                     case MotionEvent.ACTION_DOWN:
                         mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
                         editText.setText("");
                         editText.setHint("Listening...");
+
                         break;
                 }
                 return false;
