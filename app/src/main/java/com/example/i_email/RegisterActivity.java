@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -23,6 +25,9 @@ public class RegisterActivity extends AppCompatActivity {
     boolean isNameValid, isEmailValid, isPhoneValid, isPasswordValid;
     TextInputLayout nameError, emailError, phoneError, passError;
     FirebaseAuth firebaseAuth;
+    UserDetails userDetails;
+    String uid;
+    DatabaseReference reff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +44,9 @@ public class RegisterActivity extends AppCompatActivity {
         emailError = (TextInputLayout) findViewById(R.id.emailError);
         phoneError = (TextInputLayout) findViewById(R.id.phoneError);
         passError = (TextInputLayout) findViewById(R.id.passError);
+        reff= FirebaseDatabase.getInstance().getReference().child("User");
         firebaseAuth = FirebaseAuth.getInstance();
+        userDetails =new UserDetails();
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,7 +108,13 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (isNameValid && isEmailValid && isPhoneValid && isPasswordValid) {
+
+            userDetails.setEmail(email.getText().toString().trim());
+            userDetails.setPhoneNo(phone.getText().toString().trim());
+            userDetails.setUsername(name.getText().toString().trim());
             firebaseAuth.createUserWithEmailAndPassword(email.getText().toString().trim(),password.toString().trim());
+            uid = firebaseAuth.getCurrentUser().getUid();
+            reff.child(uid).setValue(userDetails);
             Toast.makeText(getApplicationContext(), "Successfully", Toast.LENGTH_SHORT).show();
         }
 
