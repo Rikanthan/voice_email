@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {
-                    int result = speechText.setLanguage(Locale.UK);
+                    int result = speechText.setLanguage(Locale.ENGLISH);
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                         Log.e("TTS", "Language not supported");
@@ -134,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void speak() {
-        String text = "Welcome to voice-email application";
-        speechText.setPitch(0.6f);
+        String text = "Welcome to voice-email application. please press mic button and speak few words to send a message.";
+        speechText.setPitch(0.8f);
         speechText.setSpeechRate(0.7f);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }

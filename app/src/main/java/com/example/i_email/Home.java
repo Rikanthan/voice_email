@@ -54,6 +54,22 @@ public class Home extends AppCompatActivity {
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         firebaseAuth = FirebaseAuth.getInstance();
         String uid= firebaseAuth.getUid();
+        speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = speechText.setLanguage(Locale.ENGLISH);
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Log.e("TTS", "Language not supported");
+                    } else {
+                        Log.e("TTS","Initialization is successfull");
+                    }
+                } else {
+                    Log.e("TTS", "Initialization failed");
+                }
+            }
+        });
         //spinner =(Spinner) findViewById(R.id.spinner);
         //spinnerDataList = new ArrayList<>();
         adapter = new ArrayAdapter<String>(Home.this, android.R.layout.activity_list_item,spinnerDataList);
@@ -110,6 +126,7 @@ public class Home extends AppCompatActivity {
             @Override
             public void onEndOfSpeech() {
                 reff.child("SentBox").setValue(editText.getText().toString().trim());
+                speak(  "Your message sent successfully");
             }
 
             @Override
@@ -147,7 +164,7 @@ public class Home extends AppCompatActivity {
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
                         editText.setHint("You will see input here");
-
+                        speak(  "              Your message sent successfully");
                         break;
 
                     case MotionEvent.ACTION_DOWN:
@@ -216,6 +233,19 @@ public class Home extends AppCompatActivity {
 
             }
         });
+    }
+    private void speak(String text) {
+        speechText.setPitch(0.8f);
+        speechText.setSpeechRate(0.2f);
+        speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+    }
+    @Override
+    protected void onDestroy() {
+        if (speechText != null) {
+            speechText.stop();
+            speechText.shutdown();
+        }
+        super.onDestroy();
     }
 
 }
