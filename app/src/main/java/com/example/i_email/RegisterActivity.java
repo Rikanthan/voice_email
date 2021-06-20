@@ -114,7 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
             userDetails.setUsername(name.getText().toString().trim());
             firebaseAuth.createUserWithEmailAndPassword(email.getText().toString().trim(),password.toString().trim());
             uid = firebaseAuth.getCurrentUser().getUid();
-            reff.child(uid).setValue(userDetails);
+            reff.child(userDetails.getUsername()).setValue(userDetails);
             Toast.makeText(getApplicationContext(), "Successfully", Toast.LENGTH_SHORT).show();
         }
 

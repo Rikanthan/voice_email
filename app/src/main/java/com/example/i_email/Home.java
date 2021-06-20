@@ -1,5 +1,6 @@
 package com.example.i_email;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -13,34 +14,70 @@ import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class Home extends AppCompatActivity {
+    private TextToSpeech speechText;
     FirebaseAuth firebaseAuth;
     DatabaseReference reff;
+    DatabaseReference userReff;
+    Spinner spinner;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> spinnerDataList;
+     ValueEventListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        //speechText=new TextToSpeech(this, (TextToSpeech.OnInitListener) this);
+
         checkPermission();
-
         final EditText editText = findViewById(R.id.editText);
-
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-
         firebaseAuth = FirebaseAuth.getInstance();
         String uid= firebaseAuth.getUid();
+        //spinner =(Spinner) findViewById(R.id.spinner);
+        //spinnerDataList = new ArrayList<>();
+        adapter = new ArrayAdapter<String>(Home.this, android.R.layout.activity_list_item,spinnerDataList);
+        //spinner.setAdapter(adapter);
+        userReff = FirebaseDatabase.getInstance().getReference().child("User");
+
+       // speak();
+
+//        userReff.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for(DataSnapshot snapshot1: snapshot.getChildren())
+//                {
+//                    spinnerDataList.add(snapshot1.getValue().toString());
+//                }
+//                adapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+              //  adapter.notifyDataSetChanged();
         reff= FirebaseDatabase.getInstance().getReference().child(uid);
         final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -161,4 +198,24 @@ public class Home extends AppCompatActivity {
                 break;
         }
     }
+
+    public void retrieveDate()
+    {
+        listener = userReff.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot item:snapshot.getChildren())
+                {
+                    spinnerDataList.add(item.getValue().toString());
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 }

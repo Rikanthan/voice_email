@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -20,6 +21,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Locale;
+
 import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     boolean isEmailValid, isPasswordValid;
     TextInputLayout emailError, passError;
     private FirebaseAuth mAuth;
+    TextToSpeech speechText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +47,22 @@ public class MainActivity extends AppCompatActivity {
         emailError = (TextInputLayout) findViewById(R.id.emailError);
         passError = (TextInputLayout) findViewById(R.id.passError);
         mAuth = FirebaseAuth.getInstance();
-
+        speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = speechText.setLanguage(Locale.UK);
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Log.e("TTS", "Language not supported");
+                    } else {
+                        Log.e("TTS","Initialization is successfull");
+                    }
+                } else {
+                    Log.e("TTS", "Initialization failed");
+                }
+            }
+        });
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(),"User Signup successfully",Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getApplicationContext(), Home.class);
                                 startActivity(intent);
+                                speak();
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -112,6 +132,20 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(getApplicationContext(), "Successfully", Toast.LENGTH_SHORT).show();
         }
 
+    }
+    private void speak() {
+        String text = "Welcome to voice-email application";
+        speechText.setPitch(0.6f);
+        speechText.setSpeechRate(0.7f);
+        speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+    }
+    @Override
+    protected void onDestroy() {
+        if (speechText != null) {
+            speechText.stop();
+            speechText.shutdown();
+        }
+        super.onDestroy();
     }
 
 }
