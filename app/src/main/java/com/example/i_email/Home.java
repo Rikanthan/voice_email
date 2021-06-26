@@ -18,6 +18,7 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -33,7 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class Home extends AppCompatActivity {
+public class Home extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private TextToSpeech speechText;
     FirebaseAuth firebaseAuth;
     DatabaseReference reff;
@@ -42,7 +43,8 @@ public class Home extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     ArrayList<String> spinnerDataList;
      ValueEventListener listener;
-
+    String [] users = {"user1","user2","user3","user4","user5","user6","user7"};
+    String selectedUser = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,11 +72,12 @@ public class Home extends AppCompatActivity {
                 }
             }
         });
-        //spinner =(Spinner) findViewById(R.id.spinner);
-        //spinnerDataList = new ArrayList<>();
-        adapter = new ArrayAdapter<String>(Home.this, android.R.layout.activity_list_item,spinnerDataList);
-        //spinner.setAdapter(adapter);
-        userReff = FirebaseDatabase.getInstance().getReference().child("User");
+        spinner =(Spinner) findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(this);
+        adapter = new ArrayAdapter<String>(Home.this, android.R.layout.simple_spinner_item,users);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        userReff = FirebaseDatabase.getInstance().getReference().child("Inbox");
 
        // speak();
 
@@ -125,7 +128,6 @@ public class Home extends AppCompatActivity {
 
             @Override
             public void onEndOfSpeech() {
-                reff.child("SentBox").setValue(editText.getText().toString().trim());
                 speak(  "Your message sent successfully");
             }
 
@@ -143,7 +145,8 @@ public class Home extends AppCompatActivity {
                 //displaying the first match
                 if (matches != null)
                     editText.setText(matches.get(0));
-                reff.child("SentBox").setValue(matches.get(0));
+                reff.child("SentBox").child("user1").child(selectedUser).setValue(editText.getText().toString().trim());
+                userReff.child(selectedUser).child("user1").setValue(editText.getText().toString().trim());
             }
 
             @Override
@@ -248,4 +251,20 @@ public class Home extends AppCompatActivity {
         super.onDestroy();
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(getApplicationContext(),users[position], Toast.LENGTH_LONG).show();
+        selectedUser = users[position];
+        speak("you selected "+users[position]);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
 }
