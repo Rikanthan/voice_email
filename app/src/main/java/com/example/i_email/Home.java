@@ -33,6 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 
 public class Home extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private TextToSpeech speechText;
@@ -41,10 +42,11 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     DatabaseReference userReff;
     Spinner spinner;
     ArrayAdapter<String> adapter;
-    ArrayList<String> spinnerDataList;
-     ValueEventListener listener;
+    ArrayList<String> spinnerDataList = new ArrayList<>();
+    ValueEventListener listener;
     String [] users = {"user1","user2","user3","user4","user5","user6","user7"};
     String selectedUser = "";
+    int index=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,29 +76,34 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         });
         spinner =(Spinner) findViewById(R.id.spinner);
         spinner.setOnItemSelectedListener(this);
-        adapter = new ArrayAdapter<String>(Home.this, android.R.layout.simple_spinner_item,users);
+        adapter = new ArrayAdapter<String>(Home.this, android.R.layout.simple_spinner_item,spinnerDataList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        userReff = FirebaseDatabase.getInstance().getReference().child("Inbox");
+        userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
 
-       // speak();
+        // speak();
 
-//        userReff.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for(DataSnapshot snapshot1: snapshot.getChildren())
-//                {
-//                    spinnerDataList.add(snapshot1.getValue().toString());
-//                }
-//                adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-              //  adapter.notifyDataSetChanged();
+        userReff.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot snapshot1: snapshot.getChildren())
+                {
+                    if(snapshot1.exists())
+                    {
+                        String val = snapshot1.getValue().toString();
+                        spinnerDataList.add(val);
+                    }
+
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+          adapter.notifyDataSetChanged();
         reff= FirebaseDatabase.getInstance().getReference().child(uid);
         final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -146,7 +153,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 if (matches != null)
                     editText.setText(matches.get(0));
                 reff.child("SentBox").child("user1").child(selectedUser).setValue(editText.getText().toString().trim());
-                userReff.child(selectedUser).child("user1").setValue(editText.getText().toString().trim());
             }
 
             @Override
@@ -219,24 +225,24 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         }
     }
 
-    public void retrieveDate()
-    {
-        listener = userReff.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot item:snapshot.getChildren())
-                {
-                    spinnerDataList.add(item.getValue().toString());
-                }
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
+//    public void retrieveDate()
+//    {
+//        listener = userReff.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for(DataSnapshot item:snapshot.getChildren())
+//                {
+//                    spinnerDataList.add(item.getValue().toString());
+//                }
+//                adapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//    }
     private void speak(String text) {
         speechText.setPitch(0.8f);
         speechText.setSpeechRate(0.2f);

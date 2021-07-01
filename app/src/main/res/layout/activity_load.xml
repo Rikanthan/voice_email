@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".load"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7"></LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        >
+
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:outlineAmbientShadowColor="@color/alublack"
+            android:outlineSpotShadowColor="@color/white"
+            android:indeterminateDuration="130"/>
+
+<!--        <com.agrawalsuneet.dotsloader.loaders.TashieLoader-->
+<!--            android:id="@+id/progress"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:tashieloader_animDelay="130"-->
+<!--            app:tashieloader_animDur="390"-->
+<!--            app:tashieloader_dotsColor="@color/colorPrimaryDark"-->
+<!--            app:tashieloader_dotsDist="5dp"-->
+<!--            app:tashieloader_dotsRadius="6dp"-->
+<!--            app:tashieloader_interpolator="@android:anim/accelerate_interpolator"-->
+<!--            app:tashieloader_noOfDots="3" />-->
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="13dp"
+            android:text="Loading data..."
+            android:gravity="center_horizontal"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7"></LinearLayout>
+</LinearLayout>

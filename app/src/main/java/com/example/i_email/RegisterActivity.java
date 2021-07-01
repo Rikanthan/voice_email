@@ -1,19 +1,18 @@
 package com.example.i_email;
 
 import android.content.Intent;
-import android.util.Patterns;
-
 import android.os.Bundle;
-import android.view.View;
+import android.util.Patterns;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -26,9 +25,9 @@ public class RegisterActivity extends AppCompatActivity {
     TextInputLayout nameError, emailError, phoneError, passError;
     FirebaseAuth firebaseAuth;
     UserDetails userDetails;
-    String uid;
+    String uid = "";
     DatabaseReference reff;
-
+    DatabaseReference userReff;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,22 +44,15 @@ public class RegisterActivity extends AppCompatActivity {
         phoneError = (TextInputLayout) findViewById(R.id.phoneError);
         passError = (TextInputLayout) findViewById(R.id.passError);
         reff= FirebaseDatabase.getInstance().getReference().child("User");
+        userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
         firebaseAuth = FirebaseAuth.getInstance();
         userDetails =new UserDetails();
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SetValidation();
-            }
-        });
+        register.setOnClickListener(v -> SetValidation());
 
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // redirect to LoginActivity
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-            }
+        login.setOnClickListener(v -> {
+            // redirect to LoginActivity
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -112,10 +104,16 @@ public class RegisterActivity extends AppCompatActivity {
             userDetails.setEmail(email.getText().toString().trim());
             userDetails.setPhoneNo(phone.getText().toString().trim());
             userDetails.setUsername(name.getText().toString().trim());
-            firebaseAuth.createUserWithEmailAndPassword(email.getText().toString().trim(),password.toString().trim());
-            uid = firebaseAuth.getCurrentUser().getUid();
-            reff.child(userDetails.getUsername()).setValue(userDetails);
-            Toast.makeText(getApplicationContext(), "Successfully", Toast.LENGTH_SHORT).show();
+            firebaseAuth.createUserWithEmailAndPassword(email.getText().toString().trim(),password.getText().toString().trim());
+            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            if(firebaseUser != null)
+            {
+                uid = firebaseUser.getUid();
+                reff.child(uid).setValue(userDetails);
+                userReff.child(uid).setValue(userDetails.username);
+                Toast.makeText(getApplicationContext(), "User Register Successfully", Toast.LENGTH_SHORT).show();
+            }
+            Toast.makeText(getApplicationContext(), "User Register Failed", Toast.LENGTH_SHORT).show();
         }
 
     }

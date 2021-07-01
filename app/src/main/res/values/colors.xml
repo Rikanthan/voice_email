@@ -13,4 +13,11 @@
     <color name="zircon">#e0e6e4</color>
     <color name="colorButton">#3d5f51</color>
     <color name="colorButtonActive">#1bea95</color>
+    <color name="green">#3B4</color>
+    <color name="alu">#27474949</color>
+    <color name="alublack">#3B3C3C</color>
+    <color name="blue">#03A9F4</color>
+    <color name="nun">#00F5F1F1</color>
+    <color name="red">#EEA43A</color>
+    <color name="dark_gray">#6c6c6c</color>
 </resources>
