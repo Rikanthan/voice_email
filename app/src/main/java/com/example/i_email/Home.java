@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,7 +45,8 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     ArrayAdapter<String> adapter;
     ArrayList<String> spinnerDataList = new ArrayList<>();
     ValueEventListener listener;
-    String [] users = {"user1","user2","user3","user4","user5","user6","user7"};
+    String receiverId = "";
+   // String [] users = {"user1","user2","user3","user4","user5","user6","user7"};
     String selectedUser = "";
     int index=0;
     @Override
@@ -56,8 +58,9 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         checkPermission();
         final EditText editText = findViewById(R.id.editText);
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        firebaseAuth = FirebaseAuth.getInstance();
-        String uid= firebaseAuth.getUid();
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        String uid= firebaseUser.getUid();
+        System.out.println("current user"+uid);
         speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -80,6 +83,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
+        reff = FirebaseDatabase.getInstance().getReference().child("User");
 
         // speak();
 
@@ -90,7 +94,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 {
                     if(snapshot1.exists())
                     {
-                        String val = snapshot1.getValue().toString();
+                        String val = snapshot1.getKey();
                         spinnerDataList.add(val);
                     }
 
@@ -104,7 +108,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
             }
         });
           adapter.notifyDataSetChanged();
-        reff= FirebaseDatabase.getInstance().getReference().child(uid);
+
         final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -152,7 +156,31 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 //displaying the first match
                 if (matches != null)
                     editText.setText(matches.get(0));
-                reff.child("SentBox").child("user1").child(selectedUser).setValue(editText.getText().toString().trim());
+                reff.child(uid).child("Sentbox").setValue(editText.getText().toString().trim());
+                userReff.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for(DataSnapshot snapshot1: snapshot.getChildren())
+                        {
+                            if(snapshot1.exists())
+                            {
+                                if(snapshot1.getKey().contains(selectedUser))
+                                {
+                                    receiverId = snapshot1.getValue().toString();
+                                    System.out.println("receiverID:"+receiverId);
+                                }
+                            }
+
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                reff.child(receiverId).child("Inbox").setValue(editText.getText().toString().trim());
             }
 
             @Override
@@ -259,9 +287,9 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(getApplicationContext(),users[position], Toast.LENGTH_LONG).show();
-        selectedUser = users[position];
-        speak("you selected "+users[position]);
+        Toast.makeText(getApplicationContext(),spinnerDataList.get(position), Toast.LENGTH_LONG).show();
+        selectedUser = spinnerDataList.get(position);
+        speak("you selected "+spinnerDataList.get(position));
     }
 
     @Override

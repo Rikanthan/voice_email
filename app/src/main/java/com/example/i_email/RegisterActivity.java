@@ -7,10 +7,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.UUID;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -104,16 +109,23 @@ public class RegisterActivity extends AppCompatActivity {
             userDetails.setEmail(email.getText().toString().trim());
             userDetails.setPhoneNo(phone.getText().toString().trim());
             userDetails.setUsername(name.getText().toString().trim());
-            firebaseAuth.createUserWithEmailAndPassword(email.getText().toString().trim(),password.getText().toString().trim());
-            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-            if(firebaseUser != null)
-            {
-                uid = firebaseUser.getUid();
-                reff.child(uid).setValue(userDetails);
-                userReff.child(uid).setValue(userDetails.username);
-                Toast.makeText(getApplicationContext(), "User Register Successfully", Toast.LENGTH_SHORT).show();
-            }
-            Toast.makeText(getApplicationContext(), "User Register Failed", Toast.LENGTH_SHORT).show();
+            firebaseAuth.createUserWithEmailAndPassword(email.getText().toString().trim(),password.getText().toString().trim())
+                    .addOnCompleteListener(
+                            new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull  Task<AuthResult> task) {
+                                    if(task.isSuccessful())
+                                    {
+                                      uid =  task.getResult().getUser().getUid();
+                                        reff.child(uid).setValue(userDetails);
+                                        userReff.child(userDetails.username).setValue(uid);
+                                        Toast.makeText(getApplicationContext(), "User Register Successfully", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                }
+                            }
+                    );
+
         }
 
     }
