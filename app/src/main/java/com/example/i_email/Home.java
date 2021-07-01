@@ -45,6 +45,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     ArrayAdapter<String> adapter;
     ArrayList<String> spinnerDataList = new ArrayList<>();
     ValueEventListener listener;
+    ArrayList<String> contacts = new ArrayList<>();
     String receiverId = "";
    // String [] users = {"user1","user2","user3","user4","user5","user6","user7"};
     String selectedUser = "";
@@ -96,6 +97,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                     {
                         String val = snapshot1.getKey();
                         spinnerDataList.add(val);
+                        contacts.add(snapshot1.getValue().toString());
                     }
 
                 }
@@ -157,29 +159,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 if (matches != null)
                     editText.setText(matches.get(0));
                 reff.child(uid).child("Sentbox").setValue(editText.getText().toString().trim());
-                userReff.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for(DataSnapshot snapshot1: snapshot.getChildren())
-                        {
-                            if(snapshot1.exists())
-                            {
-                                if(snapshot1.getKey().contains(selectedUser))
-                                {
-                                    receiverId = snapshot1.getValue().toString();
-                                    System.out.println("receiverID:"+receiverId);
-                                }
-                            }
 
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
                 reff.child(receiverId).child("Inbox").setValue(editText.getText().toString().trim());
             }
 
@@ -253,24 +233,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         }
     }
 
-//    public void retrieveDate()
-//    {
-//        listener = userReff.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for(DataSnapshot item:snapshot.getChildren())
-//                {
-//                    spinnerDataList.add(item.getValue().toString());
-//                }
-//                adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
     private void speak(String text) {
         speechText.setPitch(0.8f);
         speechText.setSpeechRate(0.2f);
@@ -289,6 +251,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         Toast.makeText(getApplicationContext(),spinnerDataList.get(position), Toast.LENGTH_LONG).show();
         selectedUser = spinnerDataList.get(position);
+        receiverId = contacts.get(position);
         speak("you selected "+spinnerDataList.get(position));
     }
 

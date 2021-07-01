@@ -121,6 +121,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         userReff.child(userDetails.username).setValue(uid);
                                         Toast.makeText(getApplicationContext(), "User Register Successfully", Toast.LENGTH_SHORT).show();
                                     }
+                                    Toast.makeText(getApplicationContext(), "User Register Failed", Toast.LENGTH_SHORT).show();
 
                                 }
                             }
