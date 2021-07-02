@@ -1,45 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
+    android:orientation="vertical"
     android:padding="12dp"
     tools:context=".Home">
 
+    <TextView
+        android:id="@+id/textView2"
+        style="@android:style/Widget.DeviceDefault.Light.TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:text="Send Message"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="26dp" />
 
+
+    <TextView
+        android:id="@+id/textView3"
+        style="@android:style/Widget.DeviceDefault.Light.TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:text="Select Contact"
+        android:textAlignment="textStart"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        tools:ignore="RtlCompat" />
     <Spinner
         android:id="@+id/spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="130dp"/>
-
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:hint="You will see input here"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
-
-
-<!--    <ImageButton-->
-<!--        android:id="@+id/send"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Button"-->
-<!--        android:layout_marginTop="400dp"-->
-<!--        android:layout_marginLeft="200dp"-->
-<!--        android:onClick="send"-->
-<!--        android:background="@drawable/ic_baseline_send_24"/>-->
-
-    <ImageButton
-        android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/ic_baseline_mic_24" />
+        android:layout_marginTop="5dp"
+        android:background="@drawable/ic_baseline_contacts_24"/>
 
-</RelativeLayout>
+
+
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="You will see input here"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
+
+        <ImageButton
+            android:layout_marginTop="20dp"
+            android:layout_gravity="end"
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_baseline_mic_24" />
+
+
+</LinearLayout>

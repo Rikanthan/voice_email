@@ -38,6 +38,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Home extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private TextToSpeech speechText;
@@ -45,7 +46,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     DatabaseReference reff;
     DatabaseReference userReff;
     Spinner spinner;
-    long inboxid = 0;
+    String inboxid = "";
     long sentboxid = 0;
     ArrayAdapter<String> adapter;
     ArrayList<String> spinnerDataList = new ArrayList<>();
@@ -56,18 +57,16 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     String currentTime = "";
     Inbox inbox;
     Sentbox sentbox;
-    String uid;
-    EditText msg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
         checkPermission();
-         msg = findViewById(R.id.editText);
+       final EditText  msg = findViewById(R.id.editText);
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-         uid= firebaseUser.getUid();
+        String uid= firebaseUser.getUid();
          inbox = new Inbox();
          sentbox = new Sentbox();
         System.out.println("current user"+uid);
@@ -104,17 +103,20 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 {
                     if(snapshot1.exists())
                     {
-                        boolean itsMe = false;
-                        if(uid.contains(snapshot1.getValue().toString()))
-                        {
-                            itsMe = true;
-                        }
-                        else if(!itsMe)
-                        {
-                            String val = snapshot1.getKey();
-                            spinnerDataList.add(val);
-                            contacts.add(snapshot1.getValue().toString());
-                        }
+                        String val = snapshot1.getKey();
+                        spinnerDataList.add(val);
+                        contacts.add(snapshot1.getValue().toString());
+//                        boolean itsMe = false;
+//                        if(uid.contains(snapshot1.getValue().toString()))
+//                        {
+//                            itsMe = true;
+//                        }
+//                        else if(!itsMe)
+//                        {
+//                            String val = snapshot1.getKey();
+//                            spinnerDataList.add(val);
+//                            contacts.add(snapshot1.getValue().toString());
+//                        }
 
                     }
 
@@ -191,20 +193,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
                     }
                 });
-                reff.child(receiverId).child("Inbox").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull  DataSnapshot snapshot) {
-                        if(snapshot.exists())
-                        {
-                            inboxid = snapshot.getChildrenCount();
-                        }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull  DatabaseError error) {
-
-                    }
-                });
                 SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
                 SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
                 Date date = new Date();
@@ -219,7 +208,8 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                     inbox.setTime(currentTime);
                     inbox.setMsg(msg.getText().toString().trim());
                     inbox.setSender(spinnerDataList.get(contacts.indexOf(uid)));
-                    reff.child(receiverId).child("Inbox").child(String.valueOf(++inboxid)).setValue(inbox);
+                    inboxid = UUID.randomUUID().toString();
+                    reff.child(receiverId).child("Inbox").child(inboxid).setValue(inbox);
             }
 
             @Override
