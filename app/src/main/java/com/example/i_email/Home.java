@@ -104,9 +104,18 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 {
                     if(snapshot1.exists())
                     {
-                        String val = snapshot1.getKey();
-                        spinnerDataList.add(val);
-                        contacts.add(snapshot1.getValue().toString());
+                        boolean itsMe = false;
+                        if(uid.contains(snapshot1.getValue().toString()))
+                        {
+                            itsMe = true;
+                        }
+                        else if(!itsMe)
+                        {
+                            String val = snapshot1.getKey();
+                            spinnerDataList.add(val);
+                            contacts.add(snapshot1.getValue().toString());
+                        }
+
                     }
 
                 }
