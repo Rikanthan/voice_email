@@ -323,55 +323,5 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
-//    public void send(View v)
-//    {
-//        reff.child(uid).child("Sentbox").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull  DataSnapshot snapshot) {
-//                if(snapshot.exists())
-//                {
-//                    sentboxid = snapshot.getChildrenCount();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull  DatabaseError error) {
-//
-//            }
-//        });
-//        reff.child(receiverId).child("Inbox").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull  DataSnapshot snapshot) {
-//                if(snapshot.exists())
-//                {
-//                    inboxid = snapshot.getChildrenCount();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull  DatabaseError error) {
-//
-//            }
-//        });
-//        SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
-//        SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
-//        Date date = new Date();
-//        Calendar calendar = Calendar.getInstance();
-//        currentDate = dateformatter.format(calendar.getTime());
-//        currentTime = timeformatter.format(calendar.getTime());
-//        sentboxid++;
-//        String sid = Long.toString(sentboxid);
-//        System.out.println(spinnerDataList.get(contacts.indexOf(uid)));
-//        sentbox.setDate(currentDate);
-//        sentbox.setTime(currentTime);
-//        sentbox.setMsg("msg");
-//        sentbox.setReceiver(selectedUser);
-//        reff.child(uid).child("Sentbox").child(sid).setValue(sentbox);
-//        inbox.setDate("07.01.2021");
-//        inbox.setTime("03:00:00");
-//        inbox.setMsg("msg");
-//        inbox.setSender(spinnerDataList.get(contacts.indexOf(uid)));
-//        reff.child(uid).child("Sentbox").child(sid).setValue(sentbox);
-//        reff.child(receiverId).child("Inbox").child(String.valueOf(++inboxid)).setValue(inbox);
-//    }
+
 }

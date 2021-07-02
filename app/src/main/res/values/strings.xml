@@ -20,6 +20,6 @@
     <string name="open">open</string>
     <string name="close">close</string>
     <string-array name="drawerOptions">
-    <item>lol</item>
+        <item>lol</item>
     </string-array>
 </resources>
