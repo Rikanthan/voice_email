@@ -32,7 +32,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -42,25 +45,31 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     DatabaseReference reff;
     DatabaseReference userReff;
     Spinner spinner;
+    long inboxid = 0;
+    long sentboxid = 0;
     ArrayAdapter<String> adapter;
     ArrayList<String> spinnerDataList = new ArrayList<>();
-    ValueEventListener listener;
     ArrayList<String> contacts = new ArrayList<>();
     String receiverId = "";
-   // String [] users = {"user1","user2","user3","user4","user5","user6","user7"};
     String selectedUser = "";
-    int index=0;
+    String currentDate = "";
+    String currentTime = "";
+    Inbox inbox;
+    Sentbox sentbox;
+    String uid;
+    EditText msg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        //speechText=new TextToSpeech(this, (TextToSpeech.OnInitListener) this);
 
         checkPermission();
-        final EditText editText = findViewById(R.id.editText);
+         msg = findViewById(R.id.editText);
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        String uid= firebaseUser.getUid();
+         uid= firebaseUser.getUid();
+         inbox = new Inbox();
+         sentbox = new Sentbox();
         System.out.println("current user"+uid);
         speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -152,15 +161,56 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
             @Override
             public void onResults(Bundle bundle) {
                 //getting all the matches
+
                 ArrayList<String> matches = bundle
                         .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-
+                Calendar calendar = Calendar.getInstance();
                 //displaying the first match
                 if (matches != null)
-                    editText.setText(matches.get(0));
-                reff.child(uid).child("Sentbox").setValue(editText.getText().toString().trim());
+                    msg.setText(matches.get(0));
+                reff.child(uid).child("Sentbox").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull  DataSnapshot snapshot) {
+                        if(snapshot.exists())
+                        {
+                            sentboxid = snapshot.getChildrenCount();
+                        }
+                    }
 
-                reff.child(receiverId).child("Inbox").setValue(editText.getText().toString().trim());
+                    @Override
+                    public void onCancelled(@NonNull  DatabaseError error) {
+
+                    }
+                });
+                reff.child(receiverId).child("Inbox").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull  DataSnapshot snapshot) {
+                        if(snapshot.exists())
+                        {
+                            inboxid = snapshot.getChildrenCount();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull  DatabaseError error) {
+
+                    }
+                });
+                SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
+                SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
+                Date date = new Date();
+                currentDate = dateformatter.format(calendar.getTime());
+                currentTime = timeformatter.format(calendar.getTime());
+                    sentbox.setDate(currentDate);
+                    sentbox.setTime(currentTime);
+                    sentbox.setMsg(msg.getText().toString().trim());
+                    sentbox.setReceiver(selectedUser);
+                    reff.child(uid).child("Sentbox").child(String.valueOf(++sentboxid)).setValue(sentbox);
+                    inbox.setDate(currentDate);
+                    inbox.setTime(currentTime);
+                    inbox.setMsg(msg.getText().toString().trim());
+                    inbox.setSender(spinnerDataList.get(contacts.indexOf(uid)));
+                    reff.child(receiverId).child("Inbox").child(String.valueOf(++inboxid)).setValue(inbox);
             }
 
             @Override
@@ -180,14 +230,14 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
-                        editText.setHint("You will see input here");
+                        msg.setHint("You will see input here");
                         speak(  "              Your message sent successfully");
                         break;
 
                     case MotionEvent.ACTION_DOWN:
                         mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
-                        editText.setText("");
-                        editText.setHint("Listening...");
+                        msg.setText("");
+                        msg.setHint("Listening...");
 
                         break;
                 }
@@ -235,7 +285,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
     private void speak(String text) {
         speechText.setPitch(0.8f);
-        speechText.setSpeechRate(0.2f);
+        speechText.setSpeechRate(0.7f);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
     @Override
@@ -264,4 +314,55 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
+//    public void send(View v)
+//    {
+//        reff.child(uid).child("Sentbox").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull  DataSnapshot snapshot) {
+//                if(snapshot.exists())
+//                {
+//                    sentboxid = snapshot.getChildrenCount();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull  DatabaseError error) {
+//
+//            }
+//        });
+//        reff.child(receiverId).child("Inbox").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull  DataSnapshot snapshot) {
+//                if(snapshot.exists())
+//                {
+//                    inboxid = snapshot.getChildrenCount();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull  DatabaseError error) {
+//
+//            }
+//        });
+//        SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
+//        SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
+//        Date date = new Date();
+//        Calendar calendar = Calendar.getInstance();
+//        currentDate = dateformatter.format(calendar.getTime());
+//        currentTime = timeformatter.format(calendar.getTime());
+//        sentboxid++;
+//        String sid = Long.toString(sentboxid);
+//        System.out.println(spinnerDataList.get(contacts.indexOf(uid)));
+//        sentbox.setDate(currentDate);
+//        sentbox.setTime(currentTime);
+//        sentbox.setMsg("msg");
+//        sentbox.setReceiver(selectedUser);
+//        reff.child(uid).child("Sentbox").child(sid).setValue(sentbox);
+//        inbox.setDate("07.01.2021");
+//        inbox.setTime("03:00:00");
+//        inbox.setMsg("msg");
+//        inbox.setSender(spinnerDataList.get(contacts.indexOf(uid)));
+//        reff.child(uid).child("Sentbox").child(sid).setValue(sentbox);
+//        reff.child(receiverId).child("Inbox").child(String.valueOf(++inboxid)).setValue(inbox);
+//    }
 }

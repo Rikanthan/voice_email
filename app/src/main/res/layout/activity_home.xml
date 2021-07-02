@@ -23,6 +23,16 @@
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
 
 
+<!--    <ImageButton-->
+<!--        android:id="@+id/send"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Button"-->
+<!--        android:layout_marginTop="400dp"-->
+<!--        android:layout_marginLeft="200dp"-->
+<!--        android:onClick="send"-->
+<!--        android:background="@drawable/ic_baseline_send_24"/>-->
+
     <ImageButton
         android:id="@+id/button"
         android:layout_width="wrap_content"

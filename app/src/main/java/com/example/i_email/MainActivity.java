@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
     private void speak() {
-        String text = "Welcome to voice-email application. please press mic button and speak few words to send a message.";
+        String text = "Welcome";//to voice-email application. please press mic button and speak few words to send a message.";
         speechText.setPitch(0.8f);
         speechText.setSpeechRate(0.7f);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
