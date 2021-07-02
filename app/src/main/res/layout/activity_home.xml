@@ -42,14 +42,28 @@
         android:layout_marginTop="5dp"
         android:background="@drawable/ic_baseline_contacts_24"/>
 
-
+    <TextView
+        android:id="@+id/textView4"
+        style="@android:style/Widget.DeviceDefault.Light.TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:text="Enter Message"
+        android:textAlignment="textStart"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        tools:ignore="RtlCompat" />
 
 
         <EditText
             android:id="@+id/editText"
+            android:textColor="@color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="You will see input here"
+            android:textColorHint="@color/white"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
 
         <ImageButton
@@ -59,6 +73,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_baseline_mic_24" />
-
-
+    <Button
+        android:id="@+id/inbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="go to your inbox"
+        android:onClick="goInbox"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+    <Button
+        android:id="@+id/sentbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginTop="10dp"
+        android:text="go to your sentbox"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginTop="10dp"
+        android:text="Logout"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
 </LinearLayout>

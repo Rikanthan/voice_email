@@ -313,5 +313,10 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
+    public void goInbox(View v)
+    {
+        Intent intent = new Intent(getApplicationContext(), ShowInbox.class);
+        startActivity(intent);
+    }
 
 }
