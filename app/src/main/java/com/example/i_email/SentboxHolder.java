@@ -11,18 +11,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class InboxHolder extends RecyclerView.Adapter<InboxHolder.ImageViewHolder> {
+public class SentboxHolder extends RecyclerView.Adapter<SentboxHolder.ImageViewHolder> {
     private final Context mContext;
-    private final List<Inbox> mInbox;
+    private final List<Sentbox> mSentbox;
     private static OnItemClickListener mListener;
-    public InboxHolder(Context context, List<Inbox> Carts) {
+    public SentboxHolder(Context context, List<Sentbox> Carts) {
         mContext = context;
-        mInbox = Carts;
+        mSentbox = Carts;
     }
     @NonNull
     @Override
     public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.inbox_recycle, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.sentbox_recycle, parent, false);
         return new ImageViewHolder(v);
     }
 
@@ -31,18 +31,18 @@ public class InboxHolder extends RecyclerView.Adapter<InboxHolder.ImageViewHolde
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
-        Inbox inbox = mInbox.get(position);
-        holder.inboxmsg.setText("   Message :  "+ inbox.getMsg());
-        holder.receivedDate.setText("   Date :  "+ inbox.getDate()+"   "+inbox.getTime());
-        holder.sender.setText("   Sender :   "+inbox.getSender());
+        Sentbox Sentbox = mSentbox.get(position);
+        holder.Sentboxmsg.setText("   Message :  "+ Sentbox.getMsg());
+        holder.receivedDate.setText("   Date :  "+ Sentbox.getDate()+"   "+Sentbox.getTime());
+        holder.receiver.setText("   Receiver :   "+Sentbox.getReceiver());
 
     }
     @Override
     public int getItemCount() {
-        return mInbox.size();
+        return mSentbox.size();
     }
     public static class ImageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView inboxmsg,receivedDate,sender;
+        public TextView Sentboxmsg,receivedDate,receiver;
 
         @Override
         public void onClick(View v) {
@@ -58,9 +58,9 @@ public class InboxHolder extends RecyclerView.Adapter<InboxHolder.ImageViewHolde
 
         public ImageViewHolder(View itemView) {
             super(itemView);
-            inboxmsg = itemView.findViewById(R.id.inboxmsg);
-            receivedDate=itemView.findViewById(R.id.receivedate);
-            sender=itemView.findViewById(R.id.sender);
+            Sentboxmsg = itemView.findViewById(R.id.sentboxmsg);
+            receivedDate=itemView.findViewById(R.id.sentdate);
+            receiver=itemView.findViewById(R.id.receiver);
             itemView.setOnClickListener(this);
         }
 

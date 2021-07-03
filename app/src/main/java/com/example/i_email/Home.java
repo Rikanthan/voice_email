@@ -318,5 +318,14 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         Intent intent = new Intent(getApplicationContext(), ShowInbox.class);
         startActivity(intent);
     }
-
+    public void goSentbox(View v)
+    {
+        Intent intent = new Intent(getApplicationContext(), ShowSentbox.class);
+        startActivity(intent);
+    }
+    public void logout(View v)
+    {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+    }
 }
