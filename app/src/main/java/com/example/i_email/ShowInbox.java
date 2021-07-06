@@ -5,10 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +40,7 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
     InboxHolder mAdapter;
     List<Inbox> newcartlist;
     int i = 0;
-
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +48,8 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         recyclerView = findViewById(R.id.show_inbox);
         recyclerView.setHasFixedSize(true);
         linearLayoutManager=new LinearLayoutManager(this);
+        toolbar = findViewById(R.id.inboxtoolbar);
+        setSupportActionBar(toolbar);
         recyclerView.setLayoutManager(linearLayoutManager);
         newcartlist=new ArrayList<>();
         firebaseAuth=FirebaseAuth.getInstance();
@@ -94,6 +101,9 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         });
     }
 
+    private void setSupportActionBar(Toolbar toolbar) {
+    }
+
     @Override
     public void onItemClick(int position) {
     databaseReference.addValueEventListener(new ValueEventListener() {
@@ -141,5 +151,32 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
             speechText.shutdown();
         }
         super.onDestroy();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main,menu);
+        return true ;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.logout:
+                Intent i = new Intent(this, MainActivity.class);
+                startActivity(i);
+                return true;
+            case R.id.sentbox_icon:
+                Intent i1 = new Intent(this, ShowSentbox.class);
+                startActivity(i1);
+                return true;
+            case R.id.inbox_icon:
+                Intent i2 = new Intent(this, ShowInbox.class);
+                startActivity(i2);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 }

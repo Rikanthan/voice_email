@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/action_settings" android:title="Settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/inbox_icon"
+        android:icon="@drawable/ic_baseline_inbox_24"
+        android:title="Inbox"/>
+
+    <item android:id="@+id/sentbox_icon"
+        android:icon="@drawable/ic_baseline_send_24"
+        android:title="Sent Box"/>
+
+    <item android:id="@+id/logout"
+        android:icon="@drawable/ic_baseline_login_24"
+        android:title="Logout"/>
 </menu>

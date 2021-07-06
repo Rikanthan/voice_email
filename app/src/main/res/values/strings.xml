@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">I-email</string>
+    <string name="app_name">Voice Email</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="login">Login</string>

@@ -5,8 +5,13 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:orientation="vertical"
-    android:padding="12dp"
+    android:padding="10dp"
     tools:context=".Home">
+
+    <android.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/textView2"
@@ -14,7 +19,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp"
         android:fontFamily="sans-serif-condensed-medium"
         android:text="Send Message"
         android:textAlignment="center"
@@ -35,13 +39,24 @@
         android:textColor="@color/white"
         android:textSize="16dp"
         tools:ignore="RtlCompat" />
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:background="@drawable/ic_baseline_contacts_24"/>
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/ic_baseline_contacts_24"/>
 
+    </androidx.appcompat.widget.LinearLayoutCompat>
     <TextView
         android:id="@+id/textView4"
         style="@android:style/Widget.DeviceDefault.Light.TextView"
@@ -56,7 +71,10 @@
         android:textSize="16dp"
         tools:ignore="RtlCompat" />
 
-
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
         <EditText
             android:id="@+id/editText"
             android:textColor="@color/white"
@@ -67,39 +85,13 @@
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
 
         <ImageButton
+            android:layout_marginStart="70dp"
             android:layout_marginTop="20dp"
-            android:layout_gravity="end"
             android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_baseline_mic_24" />
-    <Button
-        android:id="@+id/inbox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="go to your inbox"
-        android:onClick="goInbox"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
-    <Button
-        android:id="@+id/sentbox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginTop="10dp"
-        android:text="go to your sentbox"
-        android:onClick="goSentbox"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
-    <Button
-        android:id="@+id/logout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginTop="10dp"
-        android:text="Logout"
-        android:onClick="logout"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/ic_baseline_mic_24"
+            android:layout_marginLeft="50dp" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 </LinearLayout>

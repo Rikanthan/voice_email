@@ -16,6 +16,9 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +35,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,11 +63,13 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     String currentTime = "";
     Inbox inbox;
     Sentbox sentbox;
+    Toolbar tool;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
+        tool = findViewById(R.id.toolbar);
+        setSupportActionBar(tool);
         checkPermission();
        final EditText  msg = findViewById(R.id.editText);
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
@@ -104,19 +112,21 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                     if(snapshot1.exists())
                     {
                         String val = snapshot1.getKey();
-                        spinnerDataList.add(val);
-                        contacts.add(snapshot1.getValue().toString());
-//                        boolean itsMe = false;
-//                        if(uid.contains(snapshot1.getValue().toString()))
-//                        {
-//                            itsMe = true;
-//                        }
-//                        else if(!itsMe)
-//                        {
-//                            String val = snapshot1.getKey();
-//                            spinnerDataList.add(val);
-//                            contacts.add(snapshot1.getValue().toString());
-//                        }
+                     //   spinnerDataList.add(val);
+                       // contacts.add(snapshot1.getValue().toString());
+                        boolean itsMe = false;
+                        if(uid.contains(snapshot1.getValue().toString()))
+                        {
+                            itsMe = true;
+                            spinnerDataList.add("Me");
+                            contacts.add(snapshot1.getValue().toString());
+                        }
+                        else if(!itsMe)
+                        {
+                        //     val = snapshot1.getKey();
+                            spinnerDataList.add(val);
+                            contacts.add(snapshot1.getValue().toString());
+                        }
 
                     }
 
@@ -245,6 +255,9 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         });
     }
 
+    private void setSupportActionBar(Toolbar toolbar) {
+    }
+
 
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -313,19 +326,31 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
-    public void goInbox(View v)
-    {
-        Intent intent = new Intent(getApplicationContext(), ShowInbox.class);
-        startActivity(intent);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main,menu);
+        return true ;
     }
-    public void goSentbox(View v)
-    {
-        Intent intent = new Intent(getApplicationContext(), ShowSentbox.class);
-        startActivity(intent);
-    }
-    public void logout(View v)
-    {
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.logout:
+                Intent i = new Intent(this, MainActivity.class);
+                startActivity(i);
+                return true;
+            case R.id.sentbox_icon:
+                Intent i1 = new Intent(this, ShowSentbox.class);
+                startActivity(i1);
+                return true;
+            case R.id.inbox_icon:
+                Intent i2 = new Intent(this, ShowInbox.class);
+                startActivity(i2);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 }

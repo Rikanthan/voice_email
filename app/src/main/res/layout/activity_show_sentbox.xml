@@ -6,7 +6,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ShowSentbox">
-
+    <android.widget.Toolbar
+        android:id="@+id/sentboxtoolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/showout"
+        style="@android:style/Widget.DeviceDefault.Light.TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:text="Sentbox"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="22dp" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/show_sentbox"
         android:layout_width="match_parent"
