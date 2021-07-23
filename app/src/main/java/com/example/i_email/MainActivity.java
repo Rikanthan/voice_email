@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 Log.d(TAG, "signInWithEmail:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 Toast.makeText(getApplicationContext(),"User Signup successfully",Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(getApplicationContext(), Home.class);
+                                Intent intent = new Intent(getApplicationContext(), Actions.class);
                                 startActivity(intent);
                                 speak();
                             } else {
@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void resetPassword(View v)
     {
-        Intent intent = new Intent(getApplicationContext(), ResetPassword.class);
+        Intent intent = new Intent(getApplicationContext(), Contacts.class);
         startActivity(intent);
     }
 }

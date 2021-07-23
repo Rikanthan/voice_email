@@ -17,7 +17,8 @@
     <color name="alu">#27474949</color>
     <color name="alublack">#3B3C3C</color>
     <color name="blue">#03A9F4</color>
-    <color name="nun">#00F5F1F1</color>
-    <color name="red">#EEA43A</color>
+    <color name="meroon">#c70039</color>
+    <color name="red">#FF3333</color>
     <color name="dark_gray">#6c6c6c</color>
+
 </resources>

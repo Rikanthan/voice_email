@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:padding="16dp"
-    android:background="@color/colorPrimary"
+    android:background="@color/meroon"
     tools:context=".MainActivity">
 
 

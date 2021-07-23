@@ -64,6 +64,8 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     Inbox inbox;
     Sentbox sentbox;
     Toolbar tool;
+    boolean isGoToInbox = false;
+    boolean isGoToSentbox = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,7 +173,19 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
             @Override
             public void onEndOfSpeech() {
-                speak(  "Your message sent successfully");
+                if(isGoToInbox)
+                {
+                    speak(  "You go to inbox");
+                }
+                else if(isGoToSentbox)
+                {
+                    speak(  "You go to sent box");
+                }
+                else if(!isGoToSentbox && !isGoToInbox)
+                {
+                    speak(  "Your message sent successfully");
+                }
+
             }
 
             @Override
@@ -189,26 +203,40 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 //displaying the first match
                 if (matches != null)
                     msg.setText(matches.get(0));
-                reff.child(uid).child("Sentbox").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull  DataSnapshot snapshot) {
-                        if(snapshot.exists())
-                        {
-                            sentboxid = snapshot.getChildrenCount();
+                if(matches.get(0).contains("inbox"))
+                {
+                    Intent i1 = new Intent(Home.this,ShowInbox.class);
+                    startActivity(i1);
+                    isGoToInbox = true;
+                }
+                else if(matches.get(0).contains("send box"))
+                {
+                    Intent i2 = new Intent(Home.this,ShowSentbox.class);
+                    startActivity(i2);
+                    isGoToSentbox = true;
+                }
+                else if(!isGoToSentbox && !isGoToInbox)
+                {
+                    reff.child(uid).child("Sentbox").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull  DataSnapshot snapshot) {
+                            if(snapshot.exists())
+                            {
+                                sentboxid = snapshot.getChildrenCount();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull  DatabaseError error) {
+                        @Override
+                        public void onCancelled(@NonNull  DatabaseError error) {
 
-                    }
-                });
+                        }
+                    });
 
-                SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
-                SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
-                Date date = new Date();
-                currentDate = dateformatter.format(calendar.getTime());
-                currentTime = timeformatter.format(calendar.getTime());
+                    SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
+                    SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
+                    Date date = new Date();
+                    currentDate = dateformatter.format(calendar.getTime());
+                    currentTime = timeformatter.format(calendar.getTime());
                     sentbox.setDate(currentDate);
                     sentbox.setTime(currentTime);
                     sentbox.setMsg(msg.getText().toString().trim());
@@ -220,6 +248,12 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                     inbox.setSender(spinnerDataList.get(contacts.indexOf(uid)));
                     inboxid = UUID.randomUUID().toString();
                     reff.child(receiverId).child("Inbox").child(inboxid).setValue(inbox);
+                }
+
+                System.out.println(msg.getText().toString());
+                System.out.println("Inbox:"+isGoToInbox);
+                System.out.println("SentBox"+isGoToSentbox);
+
             }
 
             @Override
