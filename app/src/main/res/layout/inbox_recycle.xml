@@ -7,26 +7,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        app:cardBackgroundColor="@color/colorPrimary">
+        app:cardBackgroundColor="@color/white">
 
         <TextView
             android:id="@+id/inboxmsg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=" Message     :"
+            android:layout_marginEnd="5dp"
             android:layout_marginRight="40dp"
-            android:textColor="@color/white"
-            android:layout_marginEnd="5dp">
-        </TextView>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/sender"
-            android:text=" Sender :"
-            android:textColor="@color/white"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="5dp" >
+            android:fontFamily="@font/lato_bold"
+            android:text=" Message     :"
+            android:textColor="@color/black"
+            android:textSize="20sp">
+
         </TextView>
 
         <TextView
@@ -34,10 +27,29 @@
             android:layout_height="wrap_content"
             android:id="@+id/receivedate"
             android:text=" ReceiveDate     :"
-            android:textColor="@color/white"
+            android:textColor="@color/blue"
             android:layout_marginRight="5dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:layout_marginEnd="5dp" />
+
+        <TextView
+            android:id="@+id/sender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:fontFamily="monospace"
+            android:lineSpacingExtra="12sp"
+            android:shadowColor="#0E0C0C"
+            android:text="  Sender "
+            android:textColor="@color/black"
+            android:textStyle="italic"
+            android:typeface="serif">
+
+        </TextView>
+
+
 
     </androidx.cardview.widget.CardView>
 

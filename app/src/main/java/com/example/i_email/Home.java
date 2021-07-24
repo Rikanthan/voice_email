@@ -104,7 +104,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
         reff = FirebaseDatabase.getInstance().getReference().child("User");
 
-        // speak();
+
 
         userReff.addValueEventListener(new ValueEventListener() {
             @Override
@@ -329,7 +329,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         }
     }
 
-    private void speak(String text) {
+    public void speak(String text) {
         speechText.setPitch(0.8f);
         speechText.setSpeechRate(0.7f);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);

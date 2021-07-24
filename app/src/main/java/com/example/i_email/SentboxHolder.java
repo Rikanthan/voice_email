@@ -34,7 +34,7 @@ public class SentboxHolder extends RecyclerView.Adapter<SentboxHolder.ImageViewH
         Sentbox Sentbox = mSentbox.get(position);
         holder.Sentboxmsg.setText("   Message :  "+ Sentbox.getMsg());
         holder.receivedDate.setText("   Date :  "+ Sentbox.getDate()+"   "+Sentbox.getTime());
-        holder.receiver.setText("   Receiver :   "+Sentbox.getReceiver());
+        holder.receiver.setText("  < Receiver >   "+Sentbox.getReceiver());
 
     }
     @Override

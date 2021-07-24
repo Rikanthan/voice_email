@@ -34,7 +34,7 @@ public class InboxHolder extends RecyclerView.Adapter<InboxHolder.ImageViewHolde
         Inbox inbox = mInbox.get(position);
         holder.inboxmsg.setText("   Message :  "+ inbox.getMsg());
         holder.receivedDate.setText("   Date :  "+ inbox.getDate()+"   "+inbox.getTime());
-        holder.sender.setText("   Sender :   "+inbox.getSender());
+        holder.sender.setText("     < Sender >   "+inbox.getSender());
 
     }
     @Override

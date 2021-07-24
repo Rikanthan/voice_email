@@ -9,7 +9,7 @@
     <android.widget.Toolbar
         android:id="@+id/inboxtoolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="0dp" />
     <TextView
         android:id="@+id/showin"
         style="@android:style/Widget.DeviceDefault.Light.TextView"

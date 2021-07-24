@@ -27,6 +27,7 @@
         android:layout_gravity="start"
         android:background="@drawable/pre"
         android:layout_alignParentLeft="true"
+        android:onClick="previous"
         />
     <ImageView
         android:layout_marginTop="75dp"
@@ -42,6 +43,7 @@
         android:layout_marginTop="50dp"
         android:background="@drawable/next"
         android:layout_alignParentRight="true"
+        android:onClick="next"
 
         />
 
@@ -64,6 +66,7 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:background="@drawable/select"
+        android:onClick="selectContact"
         />
 
 </RelativeLayout>
