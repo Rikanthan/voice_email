@@ -15,21 +15,21 @@
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="26dp" />
-    <EditText
+
+    <TextView
+        android:id="@+id/seeActions"
         android:layout_marginTop="50dp"
-        android:id="@+id/action_text"
-        android:textColor="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:hint="You will see Actions here"
-        android:textColorHint="@color/black"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
+        android:layout_gravity="center"
+        android:fontFamily="sans-serif-condensed"
+        android:text="Action"
+        android:textColor="@color/black"
+        android:textSize="30dp" />
     <ImageButton
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="140dp"
         android:id="@+id/action_button"
-        android:onClick="Action"
         android:layout_width="350dp"
         android:layout_height="350dp"
         android:background="@drawable/action_img"
