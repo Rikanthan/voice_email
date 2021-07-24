@@ -26,12 +26,12 @@
         android:text="Action"
         android:textColor="@color/black"
         android:textSize="30dp" />
+
     <ImageButton
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="140dp"
         android:id="@+id/action_button"
         android:layout_width="350dp"
         android:layout_height="350dp"
-        android:background="@drawable/action_img"
-        />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="140dp"
+        android:background="@drawable/actions" />
 </LinearLayout>

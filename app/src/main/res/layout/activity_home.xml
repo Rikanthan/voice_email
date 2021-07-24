@@ -25,7 +25,6 @@
         android:textColor="@color/black"
         android:textSize="26dp" />
 
-
     <TextView
         android:id="@+id/textView3"
         style="@android:style/Widget.DeviceDefault.Light.TextView"
@@ -78,13 +77,19 @@
             android:hint="You will see message here"
             android:textColorHint="@color/black"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
+        <ImageView
+            android:layout_gravity="end"
+            android:layout_width="40dp"
+            android:layout_height="35dp"
+            android:background="@drawable/ic_baseline_attach_file_24"
+            />
     </androidx.appcompat.widget.LinearLayoutCompat>
+
     <ImageButton
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="40dp"
         android:id="@+id/button"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:background="@drawable/mic_new"
- />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/mic_blue" />
 </LinearLayout>

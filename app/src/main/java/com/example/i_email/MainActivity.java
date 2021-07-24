@@ -88,12 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         login.setOnClickListener(this);
-//        login.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                SetValidation();
-//            }
-//        });
+
 
         register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void resetPassword(View v)
     {
-        Intent intent = new Intent(getApplicationContext(), SplashScreen.class);
+        Intent intent = new Intent(getApplicationContext(), ResetPassword.class);
         startActivity(intent);
     }
     private void checkPermission() {

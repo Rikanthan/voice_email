@@ -21,28 +21,29 @@
 
     <ImageButton
         android:id="@+id/pre"
-        android:layout_marginTop="50dp"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_gravity="start"
-        android:background="@drawable/pre"
         android:layout_alignParentLeft="true"
-        android:onClick="previous"
-        />
+        android:layout_gravity="start"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/pre_blue"
+        android:onClick="previous" />
+
     <ImageView
-        android:layout_marginTop="75dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/contact_img"
         android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        android:layout_height="100dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="75dp"
+        android:background="@drawable/person" />
+
     <ImageButton
         android:id="@+id/next"
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:layout_alignParentRight="true"
         android:layout_gravity="end"
         android:layout_marginTop="50dp"
-        android:background="@drawable/next"
-        android:layout_alignParentRight="true"
+        android:background="@drawable/next_blue"
         android:onClick="next"
 
         />
