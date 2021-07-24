@@ -24,6 +24,7 @@ public class Actions extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_actions);
         actionText = findViewById(R.id.seeActions);
+        //speak("If you want go to inbox page tell us inbox.  If you want go to sent box page tell us sent box. If you want to sent a message tell us write");
         speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -40,6 +41,8 @@ public class Actions extends AppCompatActivity {
                 }
             }
         });
+
+        //speak("Thank you");
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -54,7 +57,7 @@ public class Actions extends AppCompatActivity {
 
             @Override
             public void onBeginningOfSpeech() {
-
+              //  speak("If you want go to inbox page tell us inbox.  If you want go to sent box page tell us sent box. If you want to sent a message tell us write");
             }
 
             @Override
@@ -86,21 +89,28 @@ public class Actions extends AppCompatActivity {
                 {
                     if(matches.get(0).contains("inbox"))
                     {
+                        speak("You go to inbox page");
                         Intent i1 = new Intent(Actions.this,ShowInbox.class);
                         startActivity(i1);
+
                     }
                     else if(matches.get(0).contains("send"))
                     {
+                        speak("You go to sent box page");
                         Intent i2 = new Intent(Actions.this,ShowSentbox.class);
                         startActivity(i2);
+
                     }
                     else if(matches.get(0).contains("write")
                             ||  matches.get(0).contains("right")
                                     ||  matches.get(0).contains("contacts"))
                     {
+                        speak("You go to contacts page");
                         Intent i3 = new Intent(Actions.this,Contacts.class);
                         startActivity(i3);
+
                     }
+                    //speak("Please tell correct page");
                 }
             }
 
@@ -120,14 +130,10 @@ public class Actions extends AppCompatActivity {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
-                        //msg.setHint("You will see input here");
-                        speak(  "              Your action recognizes successfully");
                         break;
 
                     case MotionEvent.ACTION_DOWN:
                         mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
-//                        msg.setText("");
-//                        msg.setHint("Listening...");
 
                         break;
                 }

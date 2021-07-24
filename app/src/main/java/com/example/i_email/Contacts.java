@@ -3,6 +3,7 @@ package com.example.i_email;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -25,15 +26,17 @@ public class Contacts extends AppCompatActivity {
     ArrayList<String> contactsId = new ArrayList<>();
     DatabaseReference userReff;
     TextToSpeech speechText;
+    String sender;
     Home home;
     TextView textView;
     int position = 0;
+    String uid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        String uid= firebaseUser.getUid();
+         uid= firebaseUser.getUid();
         home = new Home();
         textView = findViewById(R.id.contact);
         speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
@@ -65,6 +68,7 @@ public class Contacts extends AppCompatActivity {
                         if(uid.contains(snapshot1.getValue().toString()))
                         {
                             itsMe = true;
+                            sender = val;
                             contactsList.add("Me");
                             contactsId.add(snapshot1.getValue().toString());
                             if(position == 0)
@@ -126,7 +130,17 @@ public class Contacts extends AppCompatActivity {
     }
     public void selectContact(View v)
     {
-
+        try{
+            Intent intent = new Intent(this,Home.class);
+            intent.putExtra("sender",sender);
+            intent.putExtra("receiver",contactsList.get(position));
+            intent.putExtra("receiverId",contactsId.get(position));
+            startActivity(intent);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
     }
     private void speak(String text) {
         // String text = "Welcome";//to voice-email application. please press mic button and speak few words to send a message.";

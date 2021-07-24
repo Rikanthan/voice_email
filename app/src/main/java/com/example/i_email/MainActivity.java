@@ -2,11 +2,17 @@ package com.example.i_email;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.util.Patterns;
@@ -47,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        checkPermission();
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
         login = (Button) findViewById(R.id.login);
@@ -153,7 +159,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
     private void speak() {
-        String text = "Welcome";//to voice-email application. please press mic button and speak few words to send a message.";
+        String text = "Welcome to voice-email application.  If you want go to see inbox tell us inbox.  If you want go to see sent box tell us sent box. If you want to write a message tell us write";
+    //to voice-email application. please press mic button and speak few words to send a message.";
         speechText.setPitch(0.8f);
         speechText.setSpeechRate(0.7f);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
@@ -196,7 +203,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void resetPassword(View v)
     {
-        Intent intent = new Intent(getApplicationContext(), Contacts.class);
+        Intent intent = new Intent(getApplicationContext(), SplashScreen.class);
         startActivity(intent);
+    }
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:" + getPackageName()));
+                startActivity(intent);
+                finish();
+            }
+        }
     }
 }

@@ -35,6 +35,7 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
     LinearLayoutManager linearLayoutManager;
     FirebaseAuth firebaseAuth;
     String fuser;
+    int position = 0;
     Button deletebutton;
     TextToSpeech speechText;
     InboxHolder mAdapter;
@@ -88,6 +89,11 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
                     mycart.setTime(receiveTime);
                     Inbox showcart=new Inbox(msg,sender,receiveDate,receiveTime);
                     newcartlist.add(showcart);
+                    position++;
+                    if(position == snapshot.getChildrenCount())
+                    {
+                        speak("Your recent message "+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
+                    }
                 }
                 mAdapter = new InboxHolder(ShowInbox.this, newcartlist);
                 mAdapter.setOnItemClickListener(ShowInbox.this);

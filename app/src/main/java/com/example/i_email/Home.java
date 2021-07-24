@@ -25,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -43,34 +44,30 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
-import java.util.UUID;
 
-public class Home extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+public class Home extends AppCompatActivity{
     private TextToSpeech speechText;
     FirebaseAuth firebaseAuth;
     DatabaseReference reff;
     DatabaseReference userReff;
-    Spinner spinner;
-    String inboxid = "";
-    long sentboxid = 0;
-    ArrayAdapter<String> adapter;
-    ArrayList<String> spinnerDataList = new ArrayList<>();
-    ArrayList<String> contacts = new ArrayList<>();
+    TextView contactView;
+    String id = "";
     String receiverId = "";
     String selectedUser = "";
     String currentDate = "";
     String currentTime = "";
+    String sender = "";
     Inbox inbox;
     Sentbox sentbox;
     Toolbar tool;
-    boolean isGoToInbox = false;
-    boolean isGoToSentbox = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         tool = findViewById(R.id.toolbar);
+        contactView = findViewById(R.id.contactName);
         setSupportActionBar(tool);
         checkPermission();
        final EditText  msg = findViewById(R.id.editText);
@@ -79,7 +76,10 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         String uid= firebaseUser.getUid();
          inbox = new Inbox();
          sentbox = new Sentbox();
-        System.out.println("current user"+uid);
+         receiverId = getIntent().getStringExtra("receiverId");
+         selectedUser = getIntent().getStringExtra("receiver");
+         sender = getIntent().getStringExtra("sender");
+        contactView.setText(selectedUser);
         speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -96,53 +96,9 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 }
             }
         });
-        spinner =(Spinner) findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(this);
-        adapter = new ArrayAdapter<String>(Home.this, android.R.layout.simple_spinner_item,spinnerDataList);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+
         userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
         reff = FirebaseDatabase.getInstance().getReference().child("User");
-
-
-
-        userReff.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot snapshot1: snapshot.getChildren())
-                {
-                    if(snapshot1.exists())
-                    {
-                        String val = snapshot1.getKey();
-                     //   spinnerDataList.add(val);
-                       // contacts.add(snapshot1.getValue().toString());
-                        boolean itsMe = false;
-                        if(uid.contains(snapshot1.getValue().toString()))
-                        {
-                            itsMe = true;
-                            spinnerDataList.add("Me");
-                            contacts.add(snapshot1.getValue().toString());
-                        }
-                        else if(!itsMe)
-                        {
-                        //     val = snapshot1.getKey();
-                            spinnerDataList.add(val);
-                            contacts.add(snapshot1.getValue().toString());
-                        }
-
-                    }
-
-                }
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-          adapter.notifyDataSetChanged();
-
         final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -173,19 +129,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
             @Override
             public void onEndOfSpeech() {
-                if(isGoToInbox)
-                {
-                    speak(  "You go to inbox");
-                }
-                else if(isGoToSentbox)
-                {
-                    speak(  "You go to sent box");
-                }
-                else if(!isGoToSentbox && !isGoToInbox)
-                {
-                    speak(  "Your message sent successfully");
-                }
-
             }
 
             @Override
@@ -203,35 +146,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 //displaying the first match
                 if (matches != null)
                     msg.setText(matches.get(0));
-                if(matches.get(0).contains("inbox"))
-                {
-                    Intent i1 = new Intent(Home.this,ShowInbox.class);
-                    startActivity(i1);
-                    isGoToInbox = true;
-                }
-                else if(matches.get(0).contains("send box"))
-                {
-                    Intent i2 = new Intent(Home.this,ShowSentbox.class);
-                    startActivity(i2);
-                    isGoToSentbox = true;
-                }
-                else if(!isGoToSentbox && !isGoToInbox)
-                {
-                    reff.child(uid).child("Sentbox").addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull  DataSnapshot snapshot) {
-                            if(snapshot.exists())
-                            {
-                                sentboxid = snapshot.getChildrenCount();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull  DatabaseError error) {
-
-                        }
-                    });
-
                     SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
                     SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
                     Date date = new Date();
@@ -241,18 +155,13 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                     sentbox.setTime(currentTime);
                     sentbox.setMsg(msg.getText().toString().trim());
                     sentbox.setReceiver(selectedUser);
-                    reff.child(uid).child("Sentbox").child(String.valueOf(++sentboxid)).setValue(sentbox);
+                    id = currentDate+" "+currentTime;
+                    reff.child(uid).child("Sentbox").child(id).setValue(sentbox);
                     inbox.setDate(currentDate);
                     inbox.setTime(currentTime);
                     inbox.setMsg(msg.getText().toString().trim());
-                    inbox.setSender(spinnerDataList.get(contacts.indexOf(uid)));
-                    inboxid = UUID.randomUUID().toString();
-                    reff.child(receiverId).child("Inbox").child(inboxid).setValue(inbox);
-                }
-
-                System.out.println(msg.getText().toString());
-                System.out.println("Inbox:"+isGoToInbox);
-                System.out.println("SentBox"+isGoToSentbox);
+                    inbox.setSender(sender);
+                    reff.child(receiverId).child("Inbox").child(id).setValue(inbox);
 
             }
 
@@ -303,31 +212,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
             }
         }
     }
-    public void getSpeechInput(View view) {
-
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        //txvResult.setText("Hello");
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(intent, 10);
-        } else {
-            Toast.makeText(this, "Your Device Don't Support Speech Input", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case 10:
-                if (resultCode == RESULT_OK && data != null) {
-                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                }
-                break;
-        }
-    }
 
     public void speak(String text) {
         speechText.setPitch(0.8f);
@@ -343,23 +227,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         super.onDestroy();
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(getApplicationContext(),spinnerDataList.get(position), Toast.LENGTH_LONG).show();
-        selectedUser = spinnerDataList.get(position);
-        receiverId = contacts.get(position);
-        speak("you selected "+spinnerDataList.get(position));
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
