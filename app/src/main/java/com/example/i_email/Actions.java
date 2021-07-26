@@ -17,19 +17,34 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class Actions extends AppCompatActivity {
+    MainActivity mainActivity;
     TextToSpeech speechText;
     TextView actionText;
+    Locale lang;
+    Float speed, pitch;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_actions);
         actionText = findViewById(R.id.seeActions);
-        //speak("If you want go to inbox page tell us inbox.  If you want go to sent box page tell us sent box. If you want to sent a message tell us write");
+        try{
+            pitch = getIntent().getFloatExtra("pitch",0.7f);
+            speed = getIntent().getFloatExtra("speed",0.8f);
+           lang = Locale.UK;
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+            lang = Locale.UK;
+            pitch = 0.7f;
+            speed = 0.8f;
+        }
+
         speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {
-                    int result = speechText.setLanguage(Locale.ENGLISH);
+                    int result = speechText.setLanguage(lang);
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                         Log.e("TTS", "Language not supported");
@@ -110,6 +125,12 @@ public class Actions extends AppCompatActivity {
                         startActivity(i3);
 
                     }
+                    else if(matches.get(0).contains("setting"))
+                    {
+                        speak("You go to settings page");
+                        Intent i4 = new Intent(Actions.this,SettingsActivity.class);
+                        startActivity(i4);
+                    }
                     //speak("Please tell correct page");
                 }
             }
@@ -142,9 +163,8 @@ public class Actions extends AppCompatActivity {
         });
     }
     private void speak(String text) {
-        // String text = "Welcome";//to voice-email application. please press mic button and speak few words to send a message.";
-        speechText.setPitch(0.8f);
-        speechText.setSpeechRate(0.7f);
+        speechText.setPitch(pitch);
+        speechText.setSpeechRate(speed);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
     @Override

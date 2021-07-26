@@ -11,8 +11,12 @@
         android:roundIcon="@drawable/logo3"
         android:supportsRtl="true"
         android:theme="@style/Theme.Iemail">
-        <activity android:name=".SplashScreen"
-            android:theme="@style/SplashTheme"></activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
+        <activity
+            android:name=".SplashScreen"
+            android:theme="@style/SplashTheme" />
         <activity android:name=".Contacts" />
         <activity android:name=".Actions" />
         <activity android:name=".ShowSentbox" />
@@ -20,7 +24,9 @@
         <activity android:name=".ResetPassword" />
         <activity android:name=".Home" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".MainActivity" android:theme="@style/SplashTheme">
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

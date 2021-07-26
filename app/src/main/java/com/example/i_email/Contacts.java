@@ -143,7 +143,6 @@ public class Contacts extends AppCompatActivity {
         }
     }
     private void speak(String text) {
-        // String text = "Welcome";//to voice-email application. please press mic button and speak few words to send a message.";
         speechText.setPitch(0.8f);
         speechText.setSpeechRate(0.7f);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);

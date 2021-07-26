@@ -30,16 +30,26 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.Locale;
 
 import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
+    Constants constants;
     EditText email, password;
     Button login;
     TextView register;
+    Locale lang;
+    Float speed, pitch;
     String userEmail, userPassword;
     boolean isEmailValid, isPasswordValid;
     TextInputLayout emailError, passError;
@@ -54,6 +64,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         checkPermission();
+        lang = Locale.UK;
+        pitch = 0.7f;
+        speed = 0.8f;
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
         login = (Button) findViewById(R.id.login);
@@ -75,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {
-                    int result = speechText.setLanguage(Locale.ENGLISH);
+                    int result = speechText.setLanguage(lang);
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                         Log.e("TTS", "Language not supported");
@@ -138,6 +151,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 Toast.makeText(getApplicationContext(),"User Signup successfully",Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getApplicationContext(), Actions.class);
+                                setConstants();
+                                intent.putExtra("pitch",pitch);
+                                intent.putExtra("speed",speed);
+                                intent.putExtra("lang",lang.toString());
                                 startActivity(intent);
                                 speak();
                             } else {
@@ -153,11 +170,78 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+    public void setConstants()
+    {
+        String uid = FirebaseAuth.getInstance().getUid();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(uid);
+        databaseReference.child("language").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                if(snapshot.exists())
+                {
+                    if(snapshot.getValue().toString().contains("UK"))
+                    {
+                        lang = Locale.UK;
+                    }
+                    else if(snapshot.getValue().toString().contains("US"))
+                    {
+                        lang = Locale.US;
+                    }
+                    else if(snapshot.getValue().toString().contains("ENGLISH"))
+                    {
+                        lang = Locale.ENGLISH;
+                    }
+                    else if(snapshot.getValue().toString().contains("GERMAN"))
+                    {
+                        lang = Locale.GERMAN;
+                    }
+                    else if(snapshot.getValue().toString().contains("CANADA"))
+                    {
+                        lang = Locale.CANADA;
+                    }
+                   // speak();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+        databaseReference.child("pitch").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                if(snapshot.exists())
+                {
+                    pitch = Float.parseFloat(snapshot.getValue().toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+        databaseReference.child("speed").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                if(snapshot.exists())
+                {
+                    speed = Float.parseFloat(snapshot.getValue().toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void speak() {
         String text = "Welcome to voice-email application.  If you want go to see inbox tell us inbox.  If you want go to see sent box tell us sent box. If you want to write a message tell us write";
-    //to voice-email application. please press mic button and speak few words to send a message.";
-        speechText.setPitch(0.8f);
-        speechText.setSpeechRate(0.7f);
+        speechText.setPitch(pitch);
+        speechText.setSpeechRate(speed);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
     @Override
