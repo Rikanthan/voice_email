@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -57,6 +58,7 @@ public class Home extends AppCompatActivity{
     Inbox inbox;
     Sentbox sentbox;
     Toolbar tool;
+    Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +68,7 @@ public class Home extends AppCompatActivity{
         contactView = findViewById(R.id.contactName);
         setSupportActionBar(tool);
         checkPermission();
-
+        vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
        final EditText  msg = findViewById(R.id.editText);
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -108,7 +110,7 @@ public class Home extends AppCompatActivity{
 
             @Override
             public void onBeginningOfSpeech() {
-
+            vibrator.vibrate(1000);
             }
 
             @Override
