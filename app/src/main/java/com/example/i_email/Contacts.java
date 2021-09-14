@@ -39,20 +39,17 @@ public class Contacts extends AppCompatActivity {
          uid= firebaseUser.getUid();
         home = new Home();
         textView = findViewById(R.id.contact);
-        speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    int result = speechText.setLanguage(Locale.ENGLISH);
-                    if (result == TextToSpeech.LANG_MISSING_DATA
-                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Log.e("TTS", "Language not supported");
-                    } else {
-                        Log.e("TTS","Initialization is successfull");
-                    }
+        speechText = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                int result = speechText.setLanguage(Locale.ENGLISH);
+                if (result == TextToSpeech.LANG_MISSING_DATA
+                        || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("TTS", "Language not supported");
                 } else {
-                    Log.e("TTS", "Initialization failed");
+                    Log.e("TTS","Initialization is successfull");
                 }
+            } else {
+                Log.e("TTS", "Initialization failed");
             }
         });
         userReff = FirebaseDatabase.getInstance().getReference().child("UserID");

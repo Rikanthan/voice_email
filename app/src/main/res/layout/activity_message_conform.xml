@@ -4,11 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ShowInbox">
-    <android.widget.Toolbar
-        android:id="@+id/inboxtoolbar"
-        android:layout_width="match_parent"
-        android:layout_height="0dp" />
+    tools:context=".MessageConform">
     <TextView
         android:id="@+id/selectContact"
         style="@android:style/Widget.DeviceDefault.Light.TextView"
@@ -16,58 +12,49 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:fontFamily="sans-serif-condensed-medium"
-        android:text="Filter Messages"
+        android:text="Confirm Message"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="26dp" />
 
 
-    <ImageButton
-        android:id="@+id/pre"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_alignParentLeft="true"
-        android:layout_gravity="start"
-        android:layout_marginTop="50dp"
-        android:background="@drawable/pre_blue"
-        android:onClick="pre"
-        />
+
 
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="75dp"
-        android:background="@drawable/person" />
-
-    <ImageButton
-        android:id="@+id/next"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="end"
-        android:layout_marginTop="50dp"
-        android:background="@drawable/next_blue"
-        android:onClick="next"
-        />
+        android:background="@drawable/message" />
 
 
     <TextView
-        android:id="@+id/contact"
+        android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-condensed-medium"
-        android:text="Contact"
+        android:text="Message"
         android:layout_centerHorizontal="true"
         android:textColor="@color/black"
         android:layout_marginTop="200dp"
         android:textSize="26dp" />
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/show_inbox"
-        android:layout_marginTop="250dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
+    <ImageButton
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/red"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:onClick="close"
+        android:background="@drawable/close_icon"
+        />
+    <ImageButton
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:id="@+id/tick"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:onClick="confirm"
+        android:background="@drawable/select"
+        />
 </RelativeLayout>

@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void resetPassword(View v)
     {
-        Intent intent = new Intent(getApplicationContext(), ResetPassword.class);
+        Intent intent = new Intent(getApplicationContext(), ShowInbox.class);
         startActivity(intent);
     }
     private void checkPermission() {

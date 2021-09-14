@@ -11,9 +11,11 @@
         android:roundIcon="@drawable/logo3"
         android:supportsRtl="true"
         android:theme="@style/Theme.Iemail">
+        <activity android:name=".FilterMessages"></activity>
+        <activity android:name=".MessageConform" />
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
         <activity
             android:name=".SplashScreen"
             android:theme="@style/SplashTheme" />

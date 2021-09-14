@@ -48,15 +48,11 @@ import java.util.Locale;
 
 public class Home extends AppCompatActivity{
     private TextToSpeech speechText;
-    FirebaseAuth firebaseAuth;
     DatabaseReference reff;
-    DatabaseReference userReff;
+    //DatabaseReference userReff;
     TextView contactView;
-    String id = "";
     String receiverId = "";
     String selectedUser = "";
-    String currentDate = "";
-    String currentTime = "";
     String sender = "";
     Inbox inbox;
     Sentbox sentbox;
@@ -70,6 +66,7 @@ public class Home extends AppCompatActivity{
         contactView = findViewById(R.id.contactName);
         setSupportActionBar(tool);
         checkPermission();
+
        final EditText  msg = findViewById(R.id.editText);
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -80,24 +77,21 @@ public class Home extends AppCompatActivity{
          selectedUser = getIntent().getStringExtra("receiver");
          sender = getIntent().getStringExtra("sender");
         contactView.setText(selectedUser);
-        speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    int result = speechText.setLanguage(Locale.ENGLISH);
-                    if (result == TextToSpeech.LANG_MISSING_DATA
-                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Log.e("TTS", "Language not supported");
-                    } else {
-                        Log.e("TTS","Initialization is successfull");
-                    }
+        speechText = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                int result = speechText.setLanguage(Locale.ENGLISH);
+                if (result == TextToSpeech.LANG_MISSING_DATA
+                        || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("TTS", "Language not supported");
                 } else {
-                    Log.e("TTS", "Initialization failed");
+                    Log.e("TTS","Initialization is successfull");
                 }
+            } else {
+                Log.e("TTS", "Initialization failed");
             }
         });
-
-        userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
+        speak("You are in write message page");
+       // userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
         reff = FirebaseDatabase.getInstance().getReference().child("User");
         final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -145,23 +139,15 @@ public class Home extends AppCompatActivity{
                 Calendar calendar = Calendar.getInstance();
                 //displaying the first match
                 if (matches != null)
-                    msg.setText(matches.get(0));
-                    SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
-                    SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
-                    Date date = new Date();
-                    currentDate = dateformatter.format(calendar.getTime());
-                    currentTime = timeformatter.format(calendar.getTime());
-                    sentbox.setDate(currentDate);
-                    sentbox.setTime(currentTime);
-                    sentbox.setMsg(msg.getText().toString().trim());
-                    sentbox.setReceiver(selectedUser);
-                    id = currentDate+" "+currentTime;
-                    reff.child(uid).child("Sentbox").child(id).setValue(sentbox);
-                    inbox.setDate(currentDate);
-                    inbox.setTime(currentTime);
-                    inbox.setMsg(msg.getText().toString().trim());
-                    inbox.setSender(sender);
-                    reff.child(receiverId).child("Inbox").child(id).setValue(inbox);
+                    speak("Your Message is "+matches.get(0)+" Please confirm sending.");
+                Intent intent = new Intent(Home.this,MessageConform.class);
+                msg.setText(matches.get(0));
+                intent.putExtra("sender",sender);
+                intent.putExtra("receiver",selectedUser);
+                intent.putExtra("receiverId",receiverId);
+                intent.putExtra("message",matches.get(0));
+                startActivity(intent);
+
 
             }
 
@@ -183,7 +169,7 @@ public class Home extends AppCompatActivity{
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
                         msg.setHint("You will see input here");
-                        speak(  "              Your message sent successfully");
+                        speak("        Your Message is "+msg.getText().toString()+" Please confirm sending.");
                         break;
 
                     case MotionEvent.ACTION_DOWN:

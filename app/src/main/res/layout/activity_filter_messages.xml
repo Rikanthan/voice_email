@@ -4,11 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ShowInbox">
-    <android.widget.Toolbar
-        android:id="@+id/inboxtoolbar"
-        android:layout_width="match_parent"
-        android:layout_height="0dp" />
+    tools:context=".FilterMessages">
     <TextView
         android:id="@+id/selectContact"
         style="@android:style/Widget.DeviceDefault.Light.TextView"
@@ -30,8 +26,7 @@
         android:layout_gravity="start"
         android:layout_marginTop="50dp"
         android:background="@drawable/pre_blue"
-        android:onClick="pre"
-        />
+     />
 
     <ImageView
         android:layout_width="100dp"
@@ -48,7 +43,6 @@
         android:layout_gravity="end"
         android:layout_marginTop="50dp"
         android:background="@drawable/next_blue"
-        android:onClick="next"
         />
 
 
@@ -63,11 +57,5 @@
         android:layout_marginTop="200dp"
         android:textSize="26dp" />
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/show_inbox"
-        android:layout_marginTop="250dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
 </RelativeLayout>

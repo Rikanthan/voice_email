@@ -12,10 +12,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,15 +45,26 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
     List<Inbox> newcartlist;
     int i = 0;
     Toolbar toolbar;
+    ArrayList<String> contactsList = new ArrayList<>();
+    ArrayList<String> contactsId = new ArrayList<>();
+    DatabaseReference userReff;
+    String sender;
+    Home home;
+    TextView textView;
+    int pos = 0;
+    String uid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_inbox);
         recyclerView = findViewById(R.id.show_inbox);
         recyclerView.setHasFixedSize(true);
+        textView = findViewById(R.id.contact);
         linearLayoutManager=new LinearLayoutManager(this);
         toolbar = findViewById(R.id.inboxtoolbar);
         setSupportActionBar(toolbar);
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        uid = firebaseUser.getUid();
         recyclerView.setLayoutManager(linearLayoutManager);
         newcartlist=new ArrayList<>();
         firebaseAuth=FirebaseAuth.getInstance();
@@ -71,40 +85,9 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
                 }
             }
         });
-        databaseReference= FirebaseDatabase.getInstance().getReference("User").child(fuser).child("Inbox");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @org.jetbrains.annotations.NotNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot:snapshot.getChildren())
-                {
-                    Inbox mycart=dataSnapshot.getValue(Inbox.class);
-                    String msg = mycart.getMsg();
-                    String sender = mycart.getSender();
-                    String receiveDate = mycart.getDate();
-                    String receiveTime = mycart.getTime();
+        filter();
+        show();
 
-                    mycart.setMsg(msg);
-                    mycart.setSender(sender);
-                    mycart.setDate(receiveDate);
-                    mycart.setTime(receiveTime);
-                    Inbox showcart=new Inbox(msg,sender,receiveDate,receiveTime);
-                    newcartlist.add(showcart);
-                    position++;
-                    if(position == snapshot.getChildrenCount())
-                    {
-                        speak("Your recent message "+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
-                    }
-                }
-                mAdapter = new InboxHolder(ShowInbox.this, newcartlist);
-                mAdapter.setOnItemClickListener(ShowInbox.this);
-                recyclerView.setAdapter(mAdapter);
-            }
-
-            @Override
-            public void onCancelled(@NonNull @org.jetbrains.annotations.NotNull DatabaseError error) {
-
-            }
-        });
     }
 
     private void setSupportActionBar(Toolbar toolbar) {
@@ -112,32 +95,14 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
 
     @Override
     public void onItemClick(int position) {
-    databaseReference.addValueEventListener(new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-            for(DataSnapshot dataSnapshot:snapshot.getChildren())
-            {
 
-                if(i == position)
-                {
-                    Inbox mycart1=dataSnapshot.getValue(Inbox.class);
-                    String msg = mycart1.getMsg();
-                    String sender = mycart1.getSender();
-                    String receiveDate = mycart1.getDate();
-                    String receiveTime = mycart1.getTime();
+                    Inbox myInbox1 = newcartlist.get(position);
+                    String msg = myInbox1.getMsg();
+                    String sender = myInbox1.getSender();
+                    String receiveDate = myInbox1.getDate();
+                    String receiveTime = myInbox1.getTime();
                     speak("Message is"+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
-                    i = 0;
-                    break;
-                }
-                i++;
-            }
-        }
 
-        @Override
-        public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-        }
-    });
     }
 
     @Override
@@ -184,5 +149,119 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    public void show()
+    {
+        newcartlist.clear();
+        databaseReference= FirebaseDatabase.getInstance().getReference("User").child(fuser).child("Inbox");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @org.jetbrains.annotations.NotNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot:snapshot.getChildren())
+                {
+                    Inbox myInbox=dataSnapshot.getValue(Inbox.class);
+                    String msg = myInbox.getMsg();
+                    String sender = myInbox.getSender();
+                    String receiveDate = myInbox.getDate();
+                    String receiveTime = myInbox.getTime();
+                    if(sender.equals(contactsList.get(pos)))
+                    {
+                        newcartlist.add(myInbox);
+                        position++;
+                    }
+                    if(position == snapshot.getChildrenCount())
+                    {
+                        speak("Your recent message "+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
+                    }
+                }
+                mAdapter = new InboxHolder(ShowInbox.this, newcartlist);
+                mAdapter.setOnItemClickListener(ShowInbox.this);
+                recyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @org.jetbrains.annotations.NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void filter()
+    {
+        userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
+        userReff.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot snapshot1: snapshot.getChildren())
+                {
+                    if(snapshot1.exists())
+                    {
+                        String val = snapshot1.getKey();
+                        boolean itsMe = false;
+                        if(uid.contains(snapshot1.getValue().toString()))
+                        {
+                            itsMe = true;
+                            sender = val;
+                            contactsList.add("Me");
+                            contactsId.add(snapshot1.getValue().toString());
+                            if(pos == 0)
+                            {
+                               textView.setText(contactsList.get(0));
+                                speak(contactsList.get(0));
+                            }
+                        }
+                        else if(!itsMe)
+                        {
+                            contactsList.add(val);
+                            contactsId.add(snapshot1.getValue().toString());
+                        }
+
+                    }
+
+                }
+                // adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void pre(View v)
+    {
+        pos--;
+        if(pos < 0)
+        {
+            pos = 0;
+        }
+        try{
+            textView.setText(contactsList.get(pos));
+            speak(contactsList.get(pos));
+            show();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+    public void next(View v)
+    {
+        pos++;
+        if(pos > contactsList.size())
+        {
+            pos = contactsList.size();
+        }
+        try{
+            textView.setText(contactsList.get(pos));
+            speak(contactsList.get(pos));
+            show();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
     }
 }
