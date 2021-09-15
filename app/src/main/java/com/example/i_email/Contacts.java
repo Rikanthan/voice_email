@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
@@ -31,6 +32,7 @@ public class Contacts extends AppCompatActivity {
     TextView textView;
     int position = 0;
     String uid;
+    Vibrator vibrator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +40,7 @@ public class Contacts extends AppCompatActivity {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
          uid= firebaseUser.getUid();
         home = new Home();
+        vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         textView = findViewById(R.id.contact);
         speechText = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
@@ -79,22 +82,18 @@ public class Contacts extends AppCompatActivity {
                             contactsList.add(val);
                             contactsId.add(snapshot1.getValue().toString());
                         }
-
                     }
-
                 }
-               // adapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
 
     }
     public void previous(View v)
     {
+        vibrator.vibrate(150);
         position--;
         if(position < 0)
         {
@@ -111,6 +110,7 @@ public class Contacts extends AppCompatActivity {
     }
     public void next(View v)
     {
+        vibrator.vibrate(150);
         position++;
         if(position > contactsList.size())
         {
@@ -127,11 +127,13 @@ public class Contacts extends AppCompatActivity {
     }
     public void selectContact(View v)
     {
+        vibrator.vibrate(150);
         try{
             Intent intent = new Intent(this,Home.class);
             intent.putExtra("sender",sender);
             intent.putExtra("receiver",contactsList.get(position));
             intent.putExtra("receiverId",contactsId.get(position));
+            speak("You are directing to write message");
             startActivity(intent);
         }
         catch (Exception e)

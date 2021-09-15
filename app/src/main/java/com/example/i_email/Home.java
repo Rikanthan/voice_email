@@ -149,8 +149,6 @@ public class Home extends AppCompatActivity{
                 intent.putExtra("receiverId",receiverId);
                 intent.putExtra("message",matches.get(0));
                 startActivity(intent);
-
-
             }
 
             @Override

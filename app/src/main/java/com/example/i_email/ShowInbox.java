@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
@@ -34,25 +35,21 @@ import java.util.Locale;
 
 public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemClickListener{
     RecyclerView recyclerView;
-    DatabaseReference databaseReference;
+    DatabaseReference databaseReference,userReff;
     LinearLayoutManager linearLayoutManager;
     FirebaseAuth firebaseAuth;
-    String fuser;
+    String fuser,uid,sender;
     int position = 0;
-    Button deletebutton;
     TextToSpeech speechText;
     InboxHolder mAdapter;
     List<Inbox> newcartlist;
-    int i = 0;
     Toolbar toolbar;
     ArrayList<String> contactsList = new ArrayList<>();
     ArrayList<String> contactsId = new ArrayList<>();
-    DatabaseReference userReff;
-    String sender;
-    Home home;
     TextView textView;
     int pos = 0;
-    String uid;
+    Vibrator vibrator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,23 +63,21 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         uid = firebaseUser.getUid();
         recyclerView.setLayoutManager(linearLayoutManager);
-        newcartlist=new ArrayList<>();
+        newcartlist = new ArrayList<>();
+        vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         firebaseAuth=FirebaseAuth.getInstance();
         fuser=FirebaseAuth.getInstance().getCurrentUser().getUid();
-        speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    int result = speechText.setLanguage(Locale.ENGLISH);
-                    if (result == TextToSpeech.LANG_MISSING_DATA
-                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Log.e("TTS", "Language not supported");
-                    } else {
-                        Log.e("TTS","Initialization is successfull");
-                    }
+        speechText = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                int result = speechText.setLanguage(Locale.ENGLISH);
+                if (result == TextToSpeech.LANG_MISSING_DATA
+                        || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("TTS", "Language not supported");
                 } else {
-                    Log.e("TTS", "Initialization failed");
+                    Log.e("TTS","Initialization is successfull");
                 }
+            } else {
+                Log.e("TTS", "Initialization failed");
             }
         });
         filter();
@@ -95,14 +90,13 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
 
     @Override
     public void onItemClick(int position) {
-
-                    Inbox myInbox1 = newcartlist.get(position);
-                    String msg = myInbox1.getMsg();
-                    String sender = myInbox1.getSender();
-                    String receiveDate = myInbox1.getDate();
-                    String receiveTime = myInbox1.getTime();
-                    speak("Message is"+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
-
+        vibrator.vibrate(150);
+            Inbox myInbox1 = newcartlist.get(position);
+            String msg = myInbox1.getMsg();
+            String sender = myInbox1.getSender();
+            String receiveDate = myInbox1.getDate();
+            String receiveTime = myInbox1.getTime();
+            speak("Message is"+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
     }
 
     @Override
@@ -110,7 +104,6 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
 
     }
     private void speak(String text) {
-       // String text = "Welcome";//to voice-email application. please press mic button and speak few words to send a message.";
         speechText.setPitch(0.8f);
         speechText.setSpeechRate(0.7f);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
@@ -220,7 +213,6 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
                     }
 
                 }
-                // adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -232,6 +224,7 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
 
     public void pre(View v)
     {
+        vibrator.vibrate(150);
         pos--;
         if(pos < 0)
         {
@@ -249,6 +242,7 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
     }
     public void next(View v)
     {
+        vibrator.vibrate(150);
         pos++;
         if(pos > contactsList.size())
         {

@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:fontFamily="sans-serif-condensed-medium"
-        android:text="Filter Messages"
+        android:text="Inbox Messages"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="26dp" />

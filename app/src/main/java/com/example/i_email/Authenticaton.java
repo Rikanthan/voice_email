@@ -1,5 +1,6 @@
 package com.example.i_email;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -13,23 +14,40 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class Actions extends AppCompatActivity {
+public class Authenticaton extends AppCompatActivity {
+
     TextToSpeech speechText;
     TextView actionText;
     Locale lang;
     Float speed, pitch;
+    String uid;
+    DatabaseReference databaseReference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_actions);
+        setContentView(R.layout.activity_authenticaton);
         actionText = findViewById(R.id.seeActions);
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        uid = firebaseUser.getUid();
+        databaseReference = FirebaseDatabase.getInstance().getReference("User").child(uid);
+
         try{
             pitch = getIntent().getFloatExtra("pitch",0.7f);
             speed = getIntent().getFloatExtra("speed",0.8f);
-           lang = Locale.UK;
+            lang = Locale.UK;
         }
         catch (Exception e)
         {
@@ -95,35 +113,34 @@ public class Actions extends AppCompatActivity {
                 actionText.setText(matches.get(0));
                 if(matches != null)
                 {
-                    if(matches.get(0).contains("inbox"))
-                    {
-                        speak("You go to inbox page");
-                        Intent i1 = new Intent(Actions.this,ShowInbox.class);
-                        startActivity(i1);
+                    databaseReference.child("passcode").addListenerForSingleValueEvent(
+                            new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                    if(snapshot.exists())
+                                    {
+                                     String key = snapshot.getValue(String.class);
+                                        if(matches.get(0).contains(key))
+                                        {
+                                            speak("Your password is correct");
+                                            Intent i1 = new Intent(Authenticaton.this,Actions.class);
+                                            startActivity(i1);
+                                            speak("Welcome to voice-email application.  If you want go to see inbox tell us inbox.  If you want go to see sentbox tell us sentbox. If you want to write a message tell us write");
+                                        }
+                                        else
+                                        {
+                                            speak("Please tell correct passcode");
+                                        }
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-                    }
-                    else if(matches.get(0).contains("send"))
-                    {
-                        speak("You go to sent box page");
-                        Intent i2 = new Intent(Actions.this,ShowSentbox.class);
-                        startActivity(i2);
+                                }
+                            }
+                    );
 
-                    }
-                    else if(matches.get(0).contains("write")
-                            ||  matches.get(0).contains("right")
-                                    ||  matches.get(0).contains("contacts"))
-                    {
-                        speak("You go to contacts page");
-                        Intent i3 = new Intent(Actions.this,Contacts.class);
-                        startActivity(i3);
 
-                    }
-                    else if(matches.get(0).contains("setting"))
-                    {
-                        speak("You go to settings page");
-                        Intent i4 = new Intent(Actions.this,SettingsActivity.class);
-                        startActivity(i4);
-                    }
                     //speak("Please tell correct page");
                 }
             }

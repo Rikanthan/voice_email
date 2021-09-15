@@ -45,7 +45,6 @@ import java.util.Locale;
 import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    Constants constants;
     EditText email, password;
     Button login;
     TextView register;
@@ -87,20 +86,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         emailError = (TextInputLayout) findViewById(R.id.emailError);
         passError = (TextInputLayout) findViewById(R.id.passError);
         mAuth = FirebaseAuth.getInstance();
-        speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    int result = speechText.setLanguage(lang);
-                    if (result == TextToSpeech.LANG_MISSING_DATA
-                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Log.e("TTS", "Language not supported");
-                    } else {
-                        Log.e("TTS","Initialization is successfull");
-                    }
+        speechText = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                int result = speechText.setLanguage(lang);
+                if (result == TextToSpeech.LANG_MISSING_DATA
+                        || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("TTS", "Language not supported");
                 } else {
-                    Log.e("TTS", "Initialization failed");
+                    Log.e("TTS","Initialization is successfull");
                 }
+            } else {
+                Log.e("TTS", "Initialization failed");
             }
         });
         login.setOnClickListener(this);
@@ -142,29 +138,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (isEmailValid && isPasswordValid) {
             mAuth.signInWithEmailAndPassword(email.getText().toString().trim(), password.getText().toString().trim())
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Log.d(TAG, "signInWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                Toast.makeText(getApplicationContext(),"User Signup successfully",Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(getApplicationContext(), Actions.class);
-                                setConstants();
-                                intent.putExtra("pitch",pitch);
-                                intent.putExtra("speed",speed);
-                                intent.putExtra("lang",lang.toString());
-                                startActivity(intent);
-                                speak();
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w(TAG, "signInWithEmail:failure", task.getException());
-                                Toast.makeText(MainActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                            // ...
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(getApplicationContext(),"User Signup successfully",Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), Authenticaton.class);
+                            setConstants();
+                            intent.putExtra("pitch",pitch);
+                            intent.putExtra("speed",speed);
+                            intent.putExtra("lang",lang.toString());
+                            startActivity(intent);
+                            speak();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithEmail:failure", task.getException());
+                            Toast.makeText(MainActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
                         }
+                        // ...
                     });
             //Toast.makeText(getApplicationContext(), "Successfully", Toast.LENGTH_SHORT).show();
         }
@@ -239,7 +232,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void speak() {
-        String text = "Welcome to voice-email application.  If you want go to see inbox tell us inbox.  If you want go to see sent box tell us sent box. If you want to write a message tell us write";
+        String text="Please tell us your passcode";
+        //String text = "Welcome to voice-email application.  If you want go to see inbox tell us inbox.  If you want go to see sentbox tell us sentbox. If you want to write a message tell us write";
         speechText.setPitch(pitch);
         speechText.setSpeechRate(speed);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
@@ -255,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        vibrator.vibrate(10);
+        vibrator.vibrate(150);
         if (v == login) {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(email.getWindowToken(), 0);
@@ -283,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void resetPassword(View v)
     {
+        vibrator.vibrate(150);
         Intent intent = new Intent(getApplicationContext(), ShowInbox.class);
         startActivity(intent);
     }

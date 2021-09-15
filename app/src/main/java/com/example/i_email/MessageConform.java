@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ TextView msgView;
     String message = "";
     Inbox inbox;
     Sentbox sentbox;
+    Vibrator vibrator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,10 +45,12 @@ TextView msgView;
         sender = getIntent().getStringExtra("sender");
         message = getIntent().getStringExtra("message");
         msgView.setText(message);
+        vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
     }
 
     public void confirm(View view)
     {
+        vibrator.vibrate(150);
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
         SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
@@ -66,6 +70,7 @@ TextView msgView;
     }
     public void close(View view)
     {
+        vibrator.vibrate(150);
         Intent intent = new Intent(MessageConform.this,Home.class);
         startActivity(intent);
     }

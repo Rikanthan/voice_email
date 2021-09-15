@@ -7,15 +7,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,16 +34,20 @@ import java.util.Locale;
 
 public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnItemClickListener{
     RecyclerView recyclerView;
-    DatabaseReference databaseReference;
+    DatabaseReference databaseReference,userReff;
     LinearLayoutManager linearLayoutManager;
     FirebaseAuth firebaseAuth;
-    String fuser;
-    Button deletebutton;
+    String fuser,uid,sender;
     TextToSpeech speechText;
     SentboxHolder mAdapter;
     List<Sentbox> newcartlist;
-    int i = 0;
+    int pos = 0;
+    int position = 0;
+    ArrayList<String> contactsList = new ArrayList<>();
+    ArrayList<String> contactsId = new ArrayList<>();
     Toolbar toolbar;
+    TextView textView;
+    Vibrator vibrator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,56 +56,30 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
         setSupportActionBar(toolbar);
         recyclerView = findViewById(R.id.show_sentbox);
         recyclerView.setHasFixedSize(true);
-        linearLayoutManager=new LinearLayoutManager(this);
+        textView = findViewById(R.id.contact);
+        linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-        newcartlist=new ArrayList<>();
-        firebaseAuth=FirebaseAuth.getInstance();
-        fuser=FirebaseAuth.getInstance().getCurrentUser().getUid();
-        speechText = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    int result = speechText.setLanguage(Locale.ENGLISH);
-                    if (result == TextToSpeech.LANG_MISSING_DATA
-                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Log.e("TTS", "Language not supported");
-                    } else {
-                        Log.e("TTS","Initialization is successfull");
-                    }
+        newcartlist = new ArrayList<>();
+        vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        uid = firebaseUser.getUid();
+        fuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        speechText = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                int result = speechText.setLanguage(Locale.ENGLISH);
+                if (result == TextToSpeech.LANG_MISSING_DATA
+                        || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("TTS", "Language not supported");
                 } else {
-                    Log.e("TTS", "Initialization failed");
+                    Log.e("TTS","Initialization is successfully");
                 }
+            } else {
+                Log.e("TTS", "Initialization failed");
             }
         });
-        databaseReference= FirebaseDatabase.getInstance().getReference("User").child(fuser).child("Sentbox");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @org.jetbrains.annotations.NotNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot:snapshot.getChildren())
-                {
-                    Sentbox mycart=dataSnapshot.getValue(Sentbox.class);
-                    String msg = mycart.getMsg();
-                    String receiver = mycart.getReceiver();
-                    String receiveDate = mycart.getDate();
-                    String receiveTime = mycart.getTime();
-
-                    mycart.setMsg(msg);
-                    mycart.setReceiver(receiver);
-                    mycart.setDate(receiveDate);
-                    mycart.setTime(receiveTime);
-                    Sentbox showcart=new Sentbox(msg,receiver,receiveDate,receiveTime);
-                    newcartlist.add(showcart);
-                }
-                mAdapter = new SentboxHolder(ShowSentbox.this, newcartlist);
-                mAdapter.setOnItemClickListener(ShowSentbox.this);
-                recyclerView.setAdapter(mAdapter);
-            }
-
-            @Override
-            public void onCancelled(@NonNull @org.jetbrains.annotations.NotNull DatabaseError error) {
-
-            }
-        });
+        filter();
+        show();
     }
 
     private void setSupportActionBar(Toolbar toolbar) {
@@ -105,32 +87,13 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
 
     @Override
     public void onItemClick(int position) {
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot:snapshot.getChildren())
-                {
-
-                    if(i == position)
-                    {
-                        Sentbox mycart1=dataSnapshot.getValue(Sentbox.class);
-                        String msg = mycart1.getMsg();
-                        String receiver = mycart1.getReceiver();
-                        String receiveDate = mycart1.getDate();
-                        String receiveTime = mycart1.getTime();
-                        speak("Message is"+msg +" received by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
-                        i = 0;
-                        break;
-                    }
-                    i++;
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
-        });
+            vibrator.vibrate(150);
+            Sentbox mySentbox = newcartlist.get(position);
+            String msg = mySentbox.getMsg();
+            String receiver = mySentbox.getReceiver();
+            String receiveDate = mySentbox.getDate();
+            String receiveTime = mySentbox.getTime();
+            speak("Message is"+msg +" received by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
     }
 
     @Override
@@ -138,7 +101,6 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
 
     }
     private void speak(String text) {
-        // String text = "Welcome";//to voice-email application. please press mic button and speak few words to send a message.";
         speechText.setPitch(0.8f);
         speechText.setSpeechRate(0.7f);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
@@ -175,6 +137,121 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void show()
+    {
+        newcartlist.clear();
+        databaseReference= FirebaseDatabase.getInstance().getReference("User").child(fuser).child("Sentbox");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @org.jetbrains.annotations.NotNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot:snapshot.getChildren())
+                {
+                    Sentbox mySentbox = dataSnapshot.getValue(Sentbox.class);
+                    String receiver = mySentbox.getReceiver();
+                    String msg = mySentbox.getMsg();
+                    String receiveDate = mySentbox.getDate();
+                    String receiveTime = mySentbox.getTime();
+
+                    if(receiver != null && receiver.equals(contactsList.get(pos)))
+                    {
+                        newcartlist.add(mySentbox);
+                        position++;
+                    }
+                    if(position == snapshot.getChildrenCount())
+                    {
+                        speak("Your recent sent message "+msg +" receive by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
+                    }
+
+                }
+                mAdapter = new SentboxHolder(ShowSentbox.this, newcartlist);
+                mAdapter.setOnItemClickListener(ShowSentbox.this);
+                recyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @org.jetbrains.annotations.NotNull DatabaseError error) {
+
+            }
+        });
+    }
+    public void filter()
+    {
+        userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
+        userReff.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot snapshot1: snapshot.getChildren())
+                {
+                    if(snapshot1.exists())
+                    {
+                        String val = snapshot1.getKey();
+                        boolean itsMe = false;
+                        if(uid.contains(snapshot1.getValue().toString()))
+                        {
+                            itsMe = true;
+                            sender = val;
+                            contactsList.add("Me");
+                            contactsId.add(snapshot1.getValue().toString());
+                            if(pos == 0)
+                            {
+                                textView.setText(contactsList.get(0));
+                                speak(contactsList.get(0));
+                            }
+                        }
+                        else if(!itsMe)
+                        {
+                            contactsList.add(val);
+                            contactsId.add(snapshot1.getValue().toString());
+                        }
+
+                    }
+
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void pre(View v)
+    {
+        vibrator.vibrate(150);
+        pos--;
+        if(pos < 0)
+        {
+            pos = 0;
+        }
+        try{
+            textView.setText(contactsList.get(pos));
+            speak(contactsList.get(pos));
+            show();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+    public void next(View v)
+    {
+        vibrator.vibrate(150);
+        pos++;
+        if(pos > contactsList.size())
+        {
+            pos = contactsList.size();
+        }
+        try{
+            textView.setText(contactsList.get(pos));
+            speak(contactsList.get(pos));
+            show();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
         }
     }
 }
