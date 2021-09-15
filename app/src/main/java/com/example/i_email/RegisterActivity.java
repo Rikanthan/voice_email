@@ -111,16 +111,17 @@ public class RegisterActivity extends AppCompatActivity {
             userDetails.setUsername(name.getText().toString().trim());
             firebaseAuth.createUserWithEmailAndPassword(email.getText().toString().trim(),password.getText().toString().trim())
                     .addOnCompleteListener(
-                            new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull  Task<AuthResult> task) {
-                                    if(task.isSuccessful())
-                                    {
-                                      uid =  task.getResult().getUser().getUid();
-                                        reff.child(uid).setValue(userDetails);
-                                        userReff.child(userDetails.username).setValue(uid);
-                                        Toast.makeText(getApplicationContext(), "User Register Successfully", Toast.LENGTH_SHORT).show();
-                                    }
+                            task -> {
+                                if(task.isSuccessful())
+                                {
+                                  uid =  task.getResult().getUser().getUid();
+                                  Intent intent = new Intent(RegisterActivity.this,Authenticaton.class);
+                                    intent.putExtra("isLogin",false);
+                                    intent.putExtra("email",userDetails.email);
+                                    intent.putExtra("phone",userDetails.phoneNo);
+                                    intent.putExtra("username",userDetails.username);
+                                    userReff.child(userDetails.username).setValue(uid);
+                                    startActivity(intent);
                                 }
                             }
                     );

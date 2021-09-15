@@ -30,48 +30,88 @@ TextView msgView;
     Inbox inbox;
     Sentbox sentbox;
     Vibrator vibrator;
+    String email,username,phone,passCode;
+    boolean isPasscode = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_conform);
         msgView = findViewById(R.id.message);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        uid= firebaseUser.getUid();
+        uid = firebaseUser.getUid();
+        reff = FirebaseDatabase.getInstance().getReference().child("User");
         inbox = new Inbox();
         sentbox = new Sentbox();
         reff = FirebaseDatabase.getInstance().getReference().child("User");
-        receiverId = getIntent().getStringExtra("receiverId");
-        selectedUser = getIntent().getStringExtra("receiver");
-        sender = getIntent().getStringExtra("sender");
-        message = getIntent().getStringExtra("message");
-        msgView.setText(message);
+        isPasscode = getIntent().getBooleanExtra("isPasscode",false);
+        if(isPasscode)
+        {
+            email = getIntent().getStringExtra("email");
+            username = getIntent().getStringExtra("username");
+            phone = getIntent().getStringExtra("phone");
+            passCode = getIntent().getStringExtra("passcode");
+            msgView.setText(passCode);
+        }
+        else
+        {
+            receiverId = getIntent().getStringExtra("receiverId");
+            selectedUser = getIntent().getStringExtra("receiver");
+            sender = getIntent().getStringExtra("sender");
+            message = getIntent().getStringExtra("message");
+            msgView.setText(message);
+        }
+
         vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
     }
 
     public void confirm(View view)
     {
         vibrator.vibrate(150);
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
-        SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
-        currentDate = dateformatter.format(calendar.getTime());
-        currentTime = timeformatter.format(calendar.getTime());
-        sentbox.setDate(currentDate);
-        sentbox.setTime(currentTime);
-        sentbox.setMsg(message);
-        sentbox.setReceiver(selectedUser);
-        id = currentDate+" "+currentTime;
-        reff.child(uid).child("Sentbox").child(id).setValue(sentbox);
-        inbox.setDate(currentDate);
-        inbox.setTime(currentTime);
-        inbox.setMsg(message);
-        inbox.setSender(sender);
-        reff.child(receiverId).child("Inbox").child(id).setValue(inbox);
+        if(isPasscode)
+        {
+            UserDetails userDetails = new UserDetails();
+            userDetails.setEmail(email);
+            userDetails.setPhoneNo(phone);
+            userDetails.setUsername(username);
+            userDetails.setPassCode(passCode);
+            reff.child(uid).setValue(userDetails);
+        }
+        else
+        {
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat dateformatter = new SimpleDateFormat("dd MMM, yyyy");
+            SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm:ss a");
+            currentDate = dateformatter.format(calendar.getTime());
+            currentTime = timeformatter.format(calendar.getTime());
+            sentbox.setDate(currentDate);
+            sentbox.setTime(currentTime);
+            sentbox.setMsg(message);
+            sentbox.setReceiver(selectedUser);
+            id = currentDate+" "+currentTime;
+            reff.child(uid).child("Sentbox").child(id).setValue(sentbox);
+            inbox.setDate(currentDate);
+            inbox.setTime(currentTime);
+            inbox.setMsg(message);
+            inbox.setSender(sender);
+            reff.child(receiverId).child("Inbox").child(id).setValue(inbox);
+        }
     }
     public void close(View view)
     {
         vibrator.vibrate(150);
-        Intent intent = new Intent(MessageConform.this,Home.class);
-        startActivity(intent);
+        if(isPasscode)
+        {
+            Intent intent = new Intent(MessageConform.this,Authenticaton.class);
+            intent.putExtra("email",email);
+            intent.putExtra("username",username);
+            intent.putExtra("phone",phone);
+            intent.putExtra("isLogin",false);
+            startActivity(intent);
+        }
+        else
+        {
+            Intent intent = new Intent(MessageConform.this,Home.class);
+            startActivity(intent);
+        }
     }
 }

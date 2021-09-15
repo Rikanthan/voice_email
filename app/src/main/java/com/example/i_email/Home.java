@@ -148,6 +148,7 @@ public class Home extends AppCompatActivity{
                 intent.putExtra("receiver",selectedUser);
                 intent.putExtra("receiverId",receiverId);
                 intent.putExtra("message",matches.get(0));
+                intent.putExtra("isPasscode",false);
                 startActivity(intent);
             }
 

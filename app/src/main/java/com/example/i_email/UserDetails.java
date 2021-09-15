@@ -1,10 +1,11 @@
 package com.example.i_email;
 
 public class UserDetails {
-    public UserDetails(String username, String email, String phoneNo) {
+    public UserDetails(String username, String email, String phoneNo, String passCode) {
         this.username = username;
         this.email = email;
         this.phoneNo = phoneNo;
+        this.passCode = passCode;
     }
 
     public UserDetails() {
@@ -34,9 +35,20 @@ public class UserDetails {
         this.phoneNo = phoneNo;
     }
 
+
     String username;
     String email;
     String phoneNo;
+
+    public String getPassCode() {
+        return passCode;
+    }
+
+    public void setPassCode(String passCode) {
+        this.passCode = passCode;
+    }
+
+    String passCode;
 
 
 }

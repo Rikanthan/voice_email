@@ -33,8 +33,9 @@ public class Authenticaton extends AppCompatActivity {
     TextView actionText;
     Locale lang;
     Float speed, pitch;
-    String uid;
+    String uid,email,username,phone;
     DatabaseReference databaseReference;
+    boolean isLogin = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,8 +43,15 @@ public class Authenticaton extends AppCompatActivity {
         actionText = findViewById(R.id.seeActions);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         uid = firebaseUser.getUid();
-        databaseReference = FirebaseDatabase.getInstance().getReference("User").child(uid);
+        isLogin = getIntent().getBooleanExtra("isLogin",true);
+        if(!isLogin)
+        {
+            email = getIntent().getStringExtra("email");
+            username = getIntent().getStringExtra("username");
+            phone = getIntent().getStringExtra("phone");
+        }
 
+        databaseReference = FirebaseDatabase.getInstance().getReference("User").child(uid);
         try{
             pitch = getIntent().getFloatExtra("pitch",0.7f);
             speed = getIntent().getFloatExtra("speed",0.8f);
@@ -113,34 +121,44 @@ public class Authenticaton extends AppCompatActivity {
                 actionText.setText(matches.get(0));
                 if(matches != null)
                 {
-                    databaseReference.child("passcode").addListenerForSingleValueEvent(
-                            new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                                    if(snapshot.exists())
-                                    {
-                                     String key = snapshot.getValue(String.class);
-                                        if(matches.get(0).contains(key))
+                    if(isLogin)
+                    {
+                        databaseReference.child("passcode").addListenerForSingleValueEvent(
+                                new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                        if(snapshot.exists())
                                         {
-                                            speak("Your password is correct");
-                                            Intent i1 = new Intent(Authenticaton.this,Actions.class);
-                                            startActivity(i1);
-                                            speak("Welcome to voice-email application.  If you want go to see inbox tell us inbox.  If you want go to see sentbox tell us sentbox. If you want to write a message tell us write");
-                                        }
-                                        else
-                                        {
-                                            speak("Please tell correct passcode");
+                                            String key = snapshot.getValue(String.class);
+                                            if(matches.get(0).contains(key))
+                                            {
+                                                speak("Your password is correct");
+                                                Intent i1 = new Intent(Authenticaton.this,Actions.class);
+                                                startActivity(i1);
+                                                speak("Welcome to voice-email application.  If you want go to see inbox tell us inbox.  If you want go to see sentbox tell us sentbox. If you want to write a message tell us write");
+                                            }
+                                            else
+                                            {
+                                                speak("Please tell correct passcode");
+                                            }
                                         }
                                     }
+                                    @Override
+                                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                    }
                                 }
-                                @Override
-                                public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                        );
 
-                                }
-                            }
-                    );
-
-
+                    }
+                    speak("Your passcode is "+matches.get(0) + "Please confirm your passcode");
+                    Intent intent = new Intent(Authenticaton.this,MessageConform.class);
+                    intent.putExtra("email",email);
+                    intent.putExtra("phone",phone);
+                    intent.putExtra("username",username);
+                    intent.putExtra("passcode",matches.get(0));
+                    intent.putExtra("isPasscode",true);
+                    startActivity(intent);
                     //speak("Please tell correct page");
                 }
             }

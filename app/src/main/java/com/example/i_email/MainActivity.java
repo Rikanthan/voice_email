@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             intent.putExtra("pitch",pitch);
                             intent.putExtra("speed",speed);
                             intent.putExtra("lang",lang.toString());
+                            intent.putExtra("isLogin",true);
                             startActivity(intent);
                             speak();
                         } else {
