@@ -75,6 +75,8 @@ TextView msgView;
             userDetails.setUsername(username);
             userDetails.setPassCode(passCode);
             reff.child(uid).setValue(userDetails);
+            Intent intent = new Intent(MessageConform.this,MainActivity.class);
+            startActivity(intent);
         }
         else
         {
