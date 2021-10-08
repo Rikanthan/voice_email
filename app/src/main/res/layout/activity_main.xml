@@ -73,13 +73,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/editTextPassword"
-                android:text="Save Login?"
+                android:text="Save Login"
                 android:textColor="#FFF" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Keep me Sign In"/>
-
             </LinearLayout>
 
             <Button

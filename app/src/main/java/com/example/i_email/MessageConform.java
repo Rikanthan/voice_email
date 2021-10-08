@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class MessageConform extends AppCompatActivity {
-TextView msgView;
+    TextView msgView,title;
     DatabaseReference reff;
     String id = "";
     String receiverId = "";
@@ -37,6 +37,7 @@ TextView msgView;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_conform);
         msgView = findViewById(R.id.message);
+        title = findViewById(R.id.titleconfirm);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         uid = firebaseUser.getUid();
         reff = FirebaseDatabase.getInstance().getReference().child("User");
@@ -51,6 +52,7 @@ TextView msgView;
             phone = getIntent().getStringExtra("phone");
             passCode = getIntent().getStringExtra("passcode");
             msgView.setText(passCode);
+            title.setText("Confirm your passcode");
         }
         else
         {

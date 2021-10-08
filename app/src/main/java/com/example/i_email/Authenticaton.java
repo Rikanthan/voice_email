@@ -44,7 +44,7 @@ public class Authenticaton extends AppCompatActivity {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         uid = firebaseUser.getUid();
         isLogin = getIntent().getBooleanExtra("isLogin",true);
-        if(!isLogin)
+        if(!isLogin)//when doing registration
         {
             email = getIntent().getStringExtra("email");
             username = getIntent().getStringExtra("username");
@@ -123,7 +123,7 @@ public class Authenticaton extends AppCompatActivity {
                 {
                     if(isLogin)
                     {
-                        databaseReference.child("passcode").addListenerForSingleValueEvent(
+                        databaseReference.child("passCode").addListenerForSingleValueEvent(
                                 new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -151,14 +151,17 @@ public class Authenticaton extends AppCompatActivity {
                         );
 
                     }
-                    speak("Your passcode is "+matches.get(0) + "Please confirm your passcode");
-                    Intent intent = new Intent(Authenticaton.this,MessageConform.class);
-                    intent.putExtra("email",email);
-                    intent.putExtra("phone",phone);
-                    intent.putExtra("username",username);
-                    intent.putExtra("passcode",matches.get(0));
-                    intent.putExtra("isPasscode",true);
-                    startActivity(intent);
+                    else
+                    {
+                        speak("Your passcode is "+matches.get(0) + "Please confirm your passcode");
+                        Intent intent = new Intent(Authenticaton.this,MessageConform.class);
+                        intent.putExtra("email",email);
+                        intent.putExtra("phone",phone);
+                        intent.putExtra("username",username);
+                        intent.putExtra("passcode",matches.get(0));
+                        intent.putExtra("isPasscode",true);
+                        startActivity(intent);
+                    }
                     //speak("Please tell correct page");
                 }
             }

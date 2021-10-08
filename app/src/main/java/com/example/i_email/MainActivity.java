@@ -234,7 +234,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void speak() {
         String text="Please tell us your passcode";
-        //String text = "Welcome to voice-email application.  If you want go to see inbox tell us inbox.  If you want go to see sentbox tell us sentbox. If you want to write a message tell us write";
         speechText.setPitch(pitch);
         speechText.setSpeechRate(speed);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);

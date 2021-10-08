@@ -2,11 +2,16 @@ package com.example.i_email;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Locale;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
@@ -22,7 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
-
+    private TextToSpeech speechText;
     EditText name, email, phone, password;
     Button register;
     TextView login;
@@ -33,6 +38,8 @@ public class RegisterActivity extends AppCompatActivity {
     String uid = "";
     DatabaseReference reff;
     DatabaseReference userReff;
+    Vibrator vibrator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,10 +55,24 @@ public class RegisterActivity extends AppCompatActivity {
         emailError = (TextInputLayout) findViewById(R.id.emailError);
         phoneError = (TextInputLayout) findViewById(R.id.phoneError);
         passError = (TextInputLayout) findViewById(R.id.passError);
+        vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         reff= FirebaseDatabase.getInstance().getReference().child("User");
         userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
         firebaseAuth = FirebaseAuth.getInstance();
         userDetails =new UserDetails();
+        speechText = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                int result = speechText.setLanguage(Locale.ENGLISH);
+                if (result == TextToSpeech.LANG_MISSING_DATA
+                        || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("TTS", "Language not supported");
+                } else {
+                    Log.e("TTS","Initialization is successfull");
+                }
+            } else {
+                Log.e("TTS", "Initialization failed");
+            }
+        });
         register.setOnClickListener(v -> SetValidation());
 
         login.setOnClickListener(v -> {
@@ -63,6 +84,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void SetValidation() {
         // Check for a valid name.
+        vibrator.vibrate(150);
         if (name.getText().toString().isEmpty()) {
             nameError.setError(getResources().getString(R.string.name_error));
             isNameValid = false;
@@ -117,11 +139,14 @@ public class RegisterActivity extends AppCompatActivity {
                                   uid =  task.getResult().getUser().getUid();
                                   Intent intent = new Intent(RegisterActivity.this,Authenticaton.class);
                                     intent.putExtra("isLogin",false);
-                                    intent.putExtra("email",userDetails.email);
-                                    intent.putExtra("phone",userDetails.phoneNo);
-                                    intent.putExtra("username",userDetails.username);
-                                    userReff.child(userDetails.username).setValue(uid);
+                                    intent.putExtra("email",userDetails.getEmail());
+                                    intent.putExtra("phone",userDetails.getPhoneNo());
+                                    intent.putExtra("username",userDetails.getUsername());
+                                    userReff.child(userDetails.getUsername()).setValue(uid);
                                     startActivity(intent);
+                                    speak("Here we add additional authentication. " +
+                                            "So you can tell any word to authenticate. " +
+                                            "But don't tell any numbers. Only tell us single word.");
                                 }
                             }
                     );
@@ -129,6 +154,19 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
 
+    }
+    public void speak(String text) {
+        speechText.setPitch(0.8f);
+        speechText.setSpeechRate(0.7f);
+        speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+    }
+    @Override
+    protected void onDestroy() {
+        if (speechText != null) {
+            speechText.stop();
+            speechText.shutdown();
+        }
+        super.onDestroy();
     }
 
 }
