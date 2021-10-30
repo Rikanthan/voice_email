@@ -10,11 +10,13 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
@@ -33,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemClickListener{
+public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemClickListener,View.OnClickListener{
     RecyclerView recyclerView;
     DatabaseReference databaseReference,userReff;
     LinearLayoutManager linearLayoutManager;
@@ -44,6 +46,7 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
     InboxHolder mAdapter;
     List<Inbox> newcartlist;
     Toolbar toolbar;
+    ImageButton next, previous;
     ArrayList<String> contactsList = new ArrayList<>();
     ArrayList<String> contactsId = new ArrayList<>();
     TextView textView;
@@ -63,6 +66,8 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         uid = firebaseUser.getUid();
         recyclerView.setLayoutManager(linearLayoutManager);
+        previous = (ImageButton)findViewById(R.id.pre);
+        next = (ImageButton)findViewById(R.id.next);
         newcartlist = new ArrayList<>();
         vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         firebaseAuth=FirebaseAuth.getInstance();
@@ -83,6 +88,16 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         filter();
         show();
 
+        previous.setOnClickListener(
+                v -> {
+                    pre();
+                }
+            );
+        next.setOnClickListener(
+                v -> {
+                    next();
+                }
+        );
     }
 
     private void setSupportActionBar(Toolbar toolbar) {
@@ -222,7 +237,27 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         });
     }
 
-    public void pre(View v)
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int keyCode = event.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (action == KeyEvent.ACTION_DOWN) {
+                   pre();
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    next();
+                }
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
+        }
+    }
+
+    public void pre()
     {
         vibrator.vibrate(150);
         pos--;
@@ -240,7 +275,7 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
             System.out.println(e);
         }
     }
-    public void next(View v)
+    public void next()
     {
         vibrator.vibrate(150);
         pos++;
@@ -257,5 +292,10 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         {
             System.out.println(e);
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 }

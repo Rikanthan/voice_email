@@ -30,7 +30,6 @@
         android:layout_gravity="start"
         android:layout_marginTop="50dp"
         android:background="@drawable/pre_blue"
-        android:onClick="pre"
         />
 
     <ImageView
@@ -48,7 +47,6 @@
         android:layout_gravity="end"
         android:layout_marginTop="50dp"
         android:background="@drawable/next_blue"
-        android:onClick="next"
         />
 
 

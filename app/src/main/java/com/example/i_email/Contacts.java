@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,9 +24,10 @@ import com.example.i_email.Home;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class Contacts extends AppCompatActivity {
+public class Contacts extends AppCompatActivity implements View.OnClickListener {
     ArrayList<String> contactsList = new ArrayList<>();
     ArrayList<String> contactsId = new ArrayList<>();
+    ImageButton previous, next;
     DatabaseReference userReff;
     TextToSpeech speechText;
     String sender;
@@ -42,6 +45,19 @@ public class Contacts extends AppCompatActivity {
         home = new Home();
         vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         textView = findViewById(R.id.contact);
+        previous = (ImageButton) findViewById(R.id.pre);
+        next = (ImageButton) findViewById(R.id.next);
+
+        previous.setOnClickListener(
+                v -> {
+                    previous();
+                }
+        );
+        next.setOnClickListener(
+                v -> {
+                    next();
+                }
+        );
         speechText = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
                 int result = speechText.setLanguage(Locale.ENGLISH);
@@ -91,7 +107,28 @@ public class Contacts extends AppCompatActivity {
         });
 
     }
-    public void previous(View v)
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int keyCode = event.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    previous();
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    next();
+                }
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
+        }
+    }
+
+    public void previous()
     {
         vibrator.vibrate(150);
         position--;
@@ -108,7 +145,7 @@ public class Contacts extends AppCompatActivity {
             System.out.println(e);
         }
     }
-    public void next(View v)
+    public void next()
     {
         vibrator.vibrate(150);
         position++;
@@ -153,5 +190,10 @@ public class Contacts extends AppCompatActivity {
             speechText.shutdown();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 }

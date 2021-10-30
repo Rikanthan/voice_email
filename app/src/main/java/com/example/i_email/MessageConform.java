@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,10 +17,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class MessageConform extends AppCompatActivity {
     TextView msgView,title;
     DatabaseReference reff;
+    TextToSpeech speechText;
     String id = "";
     String receiverId = "";
     String selectedUser = "";
@@ -45,6 +49,20 @@ public class MessageConform extends AppCompatActivity {
         sentbox = new Sentbox();
         reff = FirebaseDatabase.getInstance().getReference().child("User");
         isPasscode = getIntent().getBooleanExtra("isPasscode",false);
+        speechText = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                int result = speechText.setLanguage(Locale.ENGLISH);
+                if (result == TextToSpeech.LANG_MISSING_DATA
+                        || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("TTS", "Language not supported");
+                } else {
+                    Log.e("TTS","Initialization is successfull");
+                }
+            } else {
+                Log.e("TTS", "Initialization failed");
+            }
+        });
+
         if(isPasscode)
         {
             email = getIntent().getStringExtra("email");
@@ -64,6 +82,9 @@ public class MessageConform extends AppCompatActivity {
         }
 
         vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+
+
+
     }
 
     public void confirm(View view)
@@ -98,7 +119,11 @@ public class MessageConform extends AppCompatActivity {
             inbox.setMsg(message);
             inbox.setSender(sender);
             reff.child(receiverId).child("Inbox").child(id).setValue(inbox);
+            speak("Your message sent successfully");
+            Intent intent = new Intent(MessageConform.this,Home.class);
+            startActivity(intent);
         }
+
     }
     public void close(View view)
     {
@@ -110,12 +135,29 @@ public class MessageConform extends AppCompatActivity {
             intent.putExtra("username",username);
             intent.putExtra("phone",phone);
             intent.putExtra("isLogin",false);
+            speak("Registration successful");
             startActivity(intent);
+
         }
         else
         {
+            speak("You cancel sending");
             Intent intent = new Intent(MessageConform.this,Home.class);
             startActivity(intent);
         }
+    }
+
+    private void speak(String text) {
+        speechText.setPitch(0.8f);
+        speechText.setSpeechRate(0.7f);
+        speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+    }
+    @Override
+    protected void onDestroy() {
+        if (speechText != null) {
+            speechText.stop();
+            speechText.shutdown();
+        }
+        super.onDestroy();
     }
 }

@@ -10,11 +10,13 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
@@ -29,13 +31,15 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnItemClickListener{
+public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnItemClickListener,View.OnClickListener{
     RecyclerView recyclerView;
     DatabaseReference databaseReference,userReff;
     LinearLayoutManager linearLayoutManager;
+    ImageButton previous, next;
     FirebaseAuth firebaseAuth;
     String fuser,uid,sender;
     TextToSpeech speechText;
@@ -43,6 +47,7 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
     List<Sentbox> newcartlist;
     int pos = 0;
     int position = 0;
+    int readPosition = 0;
     ArrayList<String> contactsList = new ArrayList<>();
     ArrayList<String> contactsId = new ArrayList<>();
     Toolbar toolbar;
@@ -60,6 +65,8 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         newcartlist = new ArrayList<>();
+        previous = (ImageButton) findViewById(R.id.pre);
+        next = (ImageButton) findViewById(R.id.next);
         vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -80,6 +87,17 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
         });
         filter();
         show();
+        previous.setOnClickListener(
+                v -> {
+                    pre();
+                  read(position);
+                }
+        );
+        next.setOnClickListener(
+                v -> {
+                    next();
+                }
+        );
     }
 
     private void setSupportActionBar(Toolbar toolbar) {
@@ -139,6 +157,16 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                 return super.onOptionsItemSelected(item);
         }
     }
+    public void read(int readPosition)
+    {
+        vibrator.vibrate(150);
+        Sentbox mySentbox = newcartlist.get(readPosition);
+        String msg = mySentbox.getMsg();
+        String receiver = mySentbox.getReceiver();
+        String receiveDate = mySentbox.getDate();
+        String receiveTime = mySentbox.getTime();
+        speak("Message is"+msg +" received by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
+    }
 
     public void show()
     {
@@ -166,7 +194,8 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                     }
 
                 }
-                mAdapter = new SentboxHolder(ShowSentbox.this, newcartlist);
+                Collections.reverse(newcartlist);
+                mAdapter = new SentboxHolder(ShowSentbox.this,newcartlist );
                 mAdapter.setOnItemClickListener(ShowSentbox.this);
                 recyclerView.setAdapter(mAdapter);
             }
@@ -218,7 +247,49 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
         });
     }
 
-    public void pre(View v)
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int keyCode = event.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    try {
+                        position++;
+                        if(position > newcartlist.size())
+                        {
+                            position = newcartlist.size();
+                        }
+                        read(position);
+                    }
+                    catch (Exception e)
+                    {
+                        System.out.println(e);
+                    }
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    try {
+                        position--;
+                        if(position < 0)
+                        {
+                            position = 0;
+                        }
+                        read(position);
+                    }
+                    catch (Exception e)
+                    {
+                        System.out.println(e);
+                    }
+                }
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
+        }
+    }
+
+    public void pre()
     {
         vibrator.vibrate(150);
         pos--;
@@ -236,7 +307,7 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
             System.out.println(e);
         }
     }
-    public void next(View v)
+    public void next()
     {
         vibrator.vibrate(150);
         pos++;
@@ -253,5 +324,10 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
         {
             System.out.println(e);
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 }
