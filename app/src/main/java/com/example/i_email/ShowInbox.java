@@ -32,6 +32,7 @@ import com.google.firebase.database.core.Context;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -52,6 +53,7 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
     TextView textView;
     int pos = 0;
     Vibrator vibrator;
+    int readPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,6 +185,7 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
                         speak("Your recent message "+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
                     }
                 }
+                Collections.reverse(newcartlist);
                 mAdapter = new InboxHolder(ShowInbox.this, newcartlist);
                 mAdapter.setOnItemClickListener(ShowInbox.this);
                 recyclerView.setAdapter(mAdapter);
@@ -242,14 +245,36 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         int action = event.getAction();
         int keyCode = event.getKeyCode();
         switch (keyCode) {
-            case KeyEvent.KEYCODE_VOLUME_UP:
-                if (action == KeyEvent.ACTION_DOWN) {
-                   pre();
-                }
-                return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (action == KeyEvent.ACTION_DOWN) {
-                    next();
+                    try{
+                        readPosition++;
+                        if(readPosition >  newcartlist.size())
+                        {
+                            readPosition = newcartlist.size();
+                        }
+                        read(readPosition);
+                    }
+                   catch (Exception e)
+                   {
+                       System.out.println(e);
+                   }
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    try{
+                        readPosition --;
+                        if(readPosition < 0)
+                        {
+                            readPosition = 0;
+                        }
+                        read(readPosition);
+                    }
+                    catch (Exception e)
+                    {
+                        System.out.println(e);
+                    }
                 }
                 return true;
             default:
@@ -297,5 +322,17 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
     @Override
     public void onClick(View v) {
 
+    }
+
+    public void read(int position)
+    {
+        vibrator.vibrate(150);
+        System.out.println("index:"+position);
+        Inbox myInbox1 = newcartlist.get(position);
+        String msg = myInbox1.getMsg();
+        String sender = myInbox1.getSender();
+        String receiveDate = myInbox1.getDate();
+        String receiveTime = myInbox1.getTime();
+        speak("Message is"+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
     }
 }

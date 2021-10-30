@@ -120,7 +120,7 @@ public class MessageConform extends AppCompatActivity {
             inbox.setSender(sender);
             reff.child(receiverId).child("Inbox").child(id).setValue(inbox);
             speak("Your message sent successfully");
-            Intent intent = new Intent(MessageConform.this,Home.class);
+            Intent intent = new Intent(MessageConform.this,Actions.class);
             startActivity(intent);
         }
 

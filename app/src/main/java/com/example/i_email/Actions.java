@@ -110,7 +110,7 @@ public class Actions extends AppCompatActivity {
 
                     }
                     else if(matches.get(0).contains("write")
-                            ||  matches.get(0).contains("right")
+                            ||  matches.get(0).contains("ght")
                                     ||  matches.get(0).contains("contacts"))
                     {
                         speak("You go to contacts page");

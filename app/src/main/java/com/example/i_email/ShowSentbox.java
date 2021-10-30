@@ -252,15 +252,15 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
         int action = event.getAction();
         int keyCode = event.getKeyCode();
         switch (keyCode) {
-            case KeyEvent.KEYCODE_VOLUME_UP:
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (action == KeyEvent.ACTION_DOWN) {
                     try {
-                        position++;
-                        if(position > newcartlist.size())
+                        readPosition++;
+                        if(readPosition > newcartlist.size())
                         {
-                            position = newcartlist.size();
+                            readPosition = newcartlist.size();
                         }
-                        read(position);
+                        read(readPosition);
                     }
                     catch (Exception e)
                     {
@@ -268,15 +268,15 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                     }
                 }
                 return true;
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
+            case KeyEvent.KEYCODE_VOLUME_UP:
                 if (action == KeyEvent.ACTION_DOWN) {
                     try {
-                        position--;
-                        if(position < 0)
+                        readPosition--;
+                        if(readPosition < 0)
                         {
-                            position = 0;
+                            readPosition = 0;
                         }
-                        read(position);
+                        read(readPosition);
                     }
                     catch (Exception e)
                     {

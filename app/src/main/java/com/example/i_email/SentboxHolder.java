@@ -1,11 +1,13 @@
 package com.example.i_email;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,7 +18,6 @@ public class SentboxHolder extends RecyclerView.Adapter<SentboxHolder.ImageViewH
     private final Context mContext;
     private final List<Sentbox> mSentbox;
     private static OnItemClickListener mListener;
-    private LinearLayoutManager linearLayoutManager;
     public SentboxHolder(Context context, List<Sentbox> Carts) {
         mContext = context;
         mSentbox = Carts;
@@ -37,8 +38,6 @@ public class SentboxHolder extends RecyclerView.Adapter<SentboxHolder.ImageViewH
         holder.Sentboxmsg.setText("   Message :  "+ Sentbox.getMsg());
         holder.receivedDate.setText("   Date :  "+ Sentbox.getDate()+"   "+Sentbox.getTime());
         holder.receiver.setText("  < Receiver >   "+Sentbox.getReceiver());
-
-
     }
     @Override
     public int getItemCount() {
@@ -46,6 +45,7 @@ public class SentboxHolder extends RecyclerView.Adapter<SentboxHolder.ImageViewH
     }
     public static class ImageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView Sentboxmsg,receivedDate,receiver;
+        public CardView cardView;
 
         @Override
         public void onClick(View v) {
@@ -64,6 +64,7 @@ public class SentboxHolder extends RecyclerView.Adapter<SentboxHolder.ImageViewH
             Sentboxmsg = itemView.findViewById(R.id.sentboxmsg);
             receivedDate=itemView.findViewById(R.id.sentdate);
             receiver=itemView.findViewById(R.id.receiver);
+            cardView = (CardView) itemView.findViewById(R.id.sentbox_card);
             itemView.setOnClickListener(this);
         }
 
