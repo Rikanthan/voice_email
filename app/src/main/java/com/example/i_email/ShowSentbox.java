@@ -90,7 +90,6 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
         previous.setOnClickListener(
                 v -> {
                     pre();
-                  read(position);
                 }
         );
         next.setOnClickListener(
@@ -254,18 +253,30 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (action == KeyEvent.ACTION_DOWN) {
-                    try {
-                        readPosition++;
-                        if(readPosition > newcartlist.size())
-                        {
-                            readPosition = newcartlist.size();
-                        }
-                        read(readPosition);
-                    }
-                    catch (Exception e)
+                    if(newcartlist.isEmpty())
                     {
-                        System.out.println(e);
+                        next();
                     }
+                    else
+                    {
+                        try {
+                            readPosition++;
+                            if(readPosition > newcartlist.size())
+                            {
+                                readPosition = 0;
+                                next();
+                            }
+                            else
+                            {
+                                read(readPosition);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            System.out.println(e);
+                        }
+                    }
+
                 }
                 return true;
             case KeyEvent.KEYCODE_VOLUME_UP:
@@ -274,9 +285,13 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                         readPosition--;
                         if(readPosition < 0)
                         {
+                            pre();
                             readPosition = 0;
                         }
-                        read(readPosition);
+                        else
+                        {
+                            read(readPosition);
+                        }
                     }
                     catch (Exception e)
                     {
