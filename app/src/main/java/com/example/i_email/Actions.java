@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -21,11 +22,13 @@ public class Actions extends AppCompatActivity {
     TextView actionText;
     Locale lang;
     Float speed, pitch;
+    Vibrator vibrator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_actions);
         actionText = findViewById(R.id.seeActions);
+        vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         try{
             pitch = getIntent().getFloatExtra("pitch",0.7f);
             speed = getIntent().getFloatExtra("speed",0.8f);
@@ -66,6 +69,7 @@ public class Actions extends AppCompatActivity {
 
             @Override
             public void onBeginningOfSpeech() {
+                vibrator.vibrate(1000);
             }
 
             @Override

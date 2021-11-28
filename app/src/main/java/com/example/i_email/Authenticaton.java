@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -35,6 +36,7 @@ public class Authenticaton extends AppCompatActivity {
     Float speed, pitch;
     String uid,email,username,phone;
     DatabaseReference databaseReference;
+    Vibrator vibrator;
     boolean isLogin = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,7 @@ public class Authenticaton extends AppCompatActivity {
         actionText = findViewById(R.id.seeActions);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         uid = firebaseUser.getUid();
+        vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         isLogin = getIntent().getBooleanExtra("isLogin",true);
         if(!isLogin)//when doing registration
         {
@@ -92,6 +95,7 @@ public class Authenticaton extends AppCompatActivity {
 
             @Override
             public void onBeginningOfSpeech() {
+                vibrator.vibrate(1000);
             }
 
             @Override

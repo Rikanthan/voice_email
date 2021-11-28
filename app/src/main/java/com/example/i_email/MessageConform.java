@@ -3,11 +3,14 @@ package com.example.i_email;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class MessageConform extends AppCompatActivity {
+public class MessageConform extends AppCompatActivity implements View.OnClickListener {
     TextView msgView,title;
     DatabaseReference reff;
     TextToSpeech speechText;
@@ -35,6 +38,7 @@ public class MessageConform extends AppCompatActivity {
     Sentbox sentbox;
     Vibrator vibrator;
     String email,username,phone,passCode;
+    ImageButton close, select;
     boolean isPasscode = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,18 @@ public class MessageConform extends AppCompatActivity {
         inbox = new Inbox();
         sentbox = new Sentbox();
         reff = FirebaseDatabase.getInstance().getReference().child("User");
+        select = findViewById(R.id.confirm);
+        close = findViewById(R.id.close);
+        close.setOnClickListener(
+                v -> {
+                    close();
+                });
+        select.setOnClickListener(
+                v -> {
+                    confirm();
+                }
+                );
+
         isPasscode = getIntent().getBooleanExtra("isPasscode",false);
         speechText = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
@@ -78,6 +94,10 @@ public class MessageConform extends AppCompatActivity {
             selectedUser = getIntent().getStringExtra("receiver");
             sender = getIntent().getStringExtra("sender");
             message = getIntent().getStringExtra("message");
+            if(message.toLowerCase().contains("please confirm sending"))
+            {
+              message =  message.toLowerCase().replaceAll("please confirm sending","");
+            }
             msgView.setText(message);
         }
 
@@ -87,7 +107,7 @@ public class MessageConform extends AppCompatActivity {
 
     }
 
-    public void confirm(View view)
+    public void confirm()
     {
         vibrator.vibrate(150);
         if(isPasscode)
@@ -98,7 +118,7 @@ public class MessageConform extends AppCompatActivity {
             userDetails.setUsername(username);
             userDetails.setPassCode(passCode);
             reff.child(uid).setValue(userDetails);
-            Intent intent = new Intent(MessageConform.this,MainActivity.class);
+            Intent intent = new Intent(MessageConform.this,Actions.class);
             startActivity(intent);
         }
         else
@@ -112,20 +132,22 @@ public class MessageConform extends AppCompatActivity {
             sentbox.setTime(currentTime);
             sentbox.setMsg(message);
             sentbox.setReceiver(selectedUser);
+            sentbox.setStatus("Unread");
             id = currentDate+" "+currentTime;
-            reff.child(uid).child("Sentbox").child(id).setValue(sentbox);
+            reff.child(uid).child("Sentbox").child("Unread").child(id).setValue(sentbox);
             inbox.setDate(currentDate);
             inbox.setTime(currentTime);
             inbox.setMsg(message);
             inbox.setSender(sender);
-            reff.child(receiverId).child("Inbox").child(id).setValue(inbox);
+            inbox.setStatus("Unread");
+            reff.child(receiverId).child("Inbox").child("Unread").child(id).setValue(inbox);
             speak("Your message sent successfully");
             Intent intent = new Intent(MessageConform.this,Actions.class);
             startActivity(intent);
         }
 
     }
-    public void close(View view)
+    public void close()
     {
         vibrator.vibrate(150);
         if(isPasscode)
@@ -142,7 +164,7 @@ public class MessageConform extends AppCompatActivity {
         else
         {
             speak("You cancel sending");
-            Intent intent = new Intent(MessageConform.this,Home.class);
+            Intent intent = new Intent(MessageConform.this,Contacts.class);
             startActivity(intent);
         }
     }
@@ -152,6 +174,27 @@ public class MessageConform extends AppCompatActivity {
         speechText.setSpeechRate(0.7f);
         speechText.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int keyCode = event.getKeyCode();
+        switch (keyCode){
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if(action == KeyEvent.ACTION_DOWN){
+                    confirm();
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if(action == KeyEvent.ACTION_DOWN){
+                    close();
+                }
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
+        }
+    }
+
     @Override
     protected void onDestroy() {
         if (speechText != null) {
@@ -159,5 +202,10 @@ public class MessageConform extends AppCompatActivity {
             speechText.shutdown();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 }

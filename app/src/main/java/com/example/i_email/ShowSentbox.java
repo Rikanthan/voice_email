@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnItemClickListener,View.OnClickListener{
     RecyclerView recyclerView;
@@ -41,15 +42,15 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
     LinearLayoutManager linearLayoutManager;
     ImageButton previous, next;
     FirebaseAuth firebaseAuth;
-    String fuser,uid,sender;
+    String fuser,uid,receiver;
     TextToSpeech speechText;
     SentboxHolder mAdapter;
     List<Sentbox> newcartlist;
     int pos = 0;
     int position = 0;
-    int readPosition = 0;
+    int readPosition = -1;
     ArrayList<String> contactsList = new ArrayList<>();
-    ArrayList<String> contactsId = new ArrayList<>();
+    ArrayList<String> keys = new ArrayList<>();
     Toolbar toolbar;
     TextView textView;
     Vibrator vibrator;
@@ -72,6 +73,10 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         uid = firebaseUser.getUid();
         fuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        databaseReference = FirebaseDatabase.getInstance().
+                            getReference("User")
+                            .child(fuser).child("Sentbox");
+        
         speechText = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
                 int result = speechText.setLanguage(Locale.ENGLISH);
@@ -104,13 +109,13 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
 
     @Override
     public void onItemClick(int position) {
-            vibrator.vibrate(150);
-            Sentbox mySentbox = newcartlist.get(position);
-            String msg = mySentbox.getMsg();
-            String receiver = mySentbox.getReceiver();
-            String receiveDate = mySentbox.getDate();
-            String receiveTime = mySentbox.getTime();
-            speak("Message is"+msg +" received by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
+//            vibrator.vibrate(150);
+//            Sentbox mySentbox = newcartlist.get(position);
+//            String msg = mySentbox.getMsg();
+//            String receiver = mySentbox.getReceiver();
+//            String receiveDate = mySentbox.getDate();
+//            String receiveTime = mySentbox.getTime();
+//            speak("Message is"+msg +" received by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
     }
 
     @Override
@@ -156,22 +161,35 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                 return super.onOptionsItemSelected(item);
         }
     }
-    public void read(int readPosition)
-    {
-        vibrator.vibrate(150);
-        Sentbox mySentbox = newcartlist.get(readPosition);
-        String msg = mySentbox.getMsg();
-        String receiver = mySentbox.getReceiver();
-        String receiveDate = mySentbox.getDate();
-        String receiveTime = mySentbox.getTime();
-        speak("Message is"+msg +" received by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
+    public void read(int readPosition)  {
+        try {
+            if(readPosition > -1)
+            {
+                vibrator.vibrate(150);
+                Sentbox mySentbox = newcartlist.get(readPosition);
+                String msg = mySentbox.getMsg();
+                String receiver = mySentbox.getReceiver();
+                String receiveDate = mySentbox.getDate();
+                String receiveTime = mySentbox.getTime();
+                speak("Message is"+msg +" received by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
+                mySentbox.setStatus("Read");
+               // TimeUnit.SECONDS.sleep(8);
+                newcartlist.remove(readPosition);
+                newcartlist.clear();
+                databaseReference.child("Unread").child(keys.get(readPosition)).removeValue();
+                databaseReference.child("Read").child(keys.get(readPosition)).setValue(mySentbox);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
     }
 
     public void show()
     {
         newcartlist.clear();
-        databaseReference= FirebaseDatabase.getInstance().getReference("User").child(fuser).child("Sentbox");
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.child("Unread").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @org.jetbrains.annotations.NotNull DataSnapshot snapshot) {
                 for(DataSnapshot dataSnapshot:snapshot.getChildren())
@@ -181,19 +199,27 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                     String msg = mySentbox.getMsg();
                     String receiveDate = mySentbox.getDate();
                     String receiveTime = mySentbox.getTime();
-
-                    if(receiver != null && receiver.equals(contactsList.get(pos)))
-                    {
-                        newcartlist.add(mySentbox);
-                        position++;
+                    try {
+                        if(receiver != null && receiver.equals(contactsList.get(pos)) &&
+                                mySentbox.getStatus().equals("Unread") &&
+                                !newcartlist.contains(mySentbox))
+                        {
+                            newcartlist.add(mySentbox);
+                            position++;
+                        }
+                        if(position == snapshot.getChildrenCount())
+                        {
+                            speak("You have send new message");
+                        }
                     }
-                    if(position == snapshot.getChildrenCount())
+                    catch (Exception e)
                     {
-                        speak("Your recent sent message "+msg +" receive by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
+                        System.out.println(e);
                     }
 
                 }
                 Collections.reverse(newcartlist);
+                Collections.reverse(keys);
                 mAdapter = new SentboxHolder(ShowSentbox.this,newcartlist );
                 mAdapter.setOnItemClickListener(ShowSentbox.this);
                 recyclerView.setAdapter(mAdapter);
@@ -207,34 +233,27 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
     }
     public void filter()
     {
-        userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
-        userReff.addValueEventListener(new ValueEventListener() {
+        keys.clear();
+        databaseReference.child("Unread").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot snapshot1: snapshot.getChildren())
                 {
                     if(snapshot1.exists())
                     {
-                        String val = snapshot1.getKey();
-                        boolean itsMe = false;
-                        if(uid.contains(snapshot1.getValue().toString()))
+                        Sentbox sentbox = snapshot1.getValue(Sentbox.class);
+                        String key = snapshot1.getKey();
+                        keys.add(key);
+                        receiver = sentbox.getReceiver();
+                        if(!contactsList.contains(receiver))
                         {
-                            itsMe = true;
-                            sender = val;
-                            contactsList.add("Me");
-                            contactsId.add(snapshot1.getValue().toString());
+                            contactsList.add(receiver);
                             if(pos == 0)
                             {
                                 textView.setText(contactsList.get(0));
                                 speak(contactsList.get(0));
                             }
                         }
-                        else if(!itsMe)
-                        {
-                            contactsList.add(val);
-                            contactsId.add(snapshot1.getValue().toString());
-                        }
-
                     }
 
                 }
@@ -263,12 +282,13 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                             readPosition++;
                             if(readPosition > newcartlist.size())
                             {
-                                readPosition = 0;
+                                readPosition = -1;
                                 next();
                             }
                             else
                             {
-                                read(readPosition);
+
+                                read(0);
                             }
                         }
                         catch (Exception e)

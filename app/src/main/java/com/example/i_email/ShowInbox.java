@@ -35,8 +35,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemClickListener,View.OnClickListener{
+public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemClickListener,
+        View.OnClickListener{
     RecyclerView recyclerView;
     DatabaseReference databaseReference,userReff;
     LinearLayoutManager linearLayoutManager;
@@ -49,11 +51,11 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
     Toolbar toolbar;
     ImageButton next, previous;
     ArrayList<String> contactsList = new ArrayList<>();
-    ArrayList<String> contactsId = new ArrayList<>();
+    ArrayList<String> keys = new ArrayList<>();
     TextView textView;
     int pos = 0;
     Vibrator vibrator;
-    int readPosition = 0;
+    int readPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +75,12 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         newcartlist = new ArrayList<>();
         vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         firebaseAuth=FirebaseAuth.getInstance();
-        fuser=FirebaseAuth.getInstance().getCurrentUser().getUid();
+        fuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        databaseReference = FirebaseDatabase
+                            .getInstance()
+                            .getReference("User")
+                            .child(fuser)
+                            .child("Inbox");
         speechText = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
                 int result = speechText.setLanguage(Locale.ENGLISH);
@@ -164,28 +171,36 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
     public void show()
     {
         newcartlist.clear();
-        databaseReference= FirebaseDatabase.getInstance().getReference("User").child(fuser).child("Inbox");
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.child("Unread").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @org.jetbrains.annotations.NotNull DataSnapshot snapshot) {
                 for(DataSnapshot dataSnapshot:snapshot.getChildren())
                 {
-                    Inbox myInbox=dataSnapshot.getValue(Inbox.class);
+                    Inbox myInbox = dataSnapshot.getValue(Inbox.class);
                     String msg = myInbox.getMsg();
                     String sender = myInbox.getSender();
                     String receiveDate = myInbox.getDate();
                     String receiveTime = myInbox.getTime();
-                    if(sender.equals(contactsList.get(pos)))
-                    {
-                        newcartlist.add(myInbox);
-                        position++;
+                    try {
+                        if(sender.equals(contactsList.get(pos))
+                                && myInbox.getStatus().equals("Unread")
+                                && !newcartlist.contains(myInbox))
+                        {
+                            newcartlist.add(myInbox);
+                            position++;
+                        }
+                        if(position == snapshot.getChildrenCount())
+                        {
+                            speak("You have received new message ");
+                        }
                     }
-                    if(position == snapshot.getChildrenCount())
+                    catch (Exception e)
                     {
-                        speak("Your recent message "+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
+                        System.out.println(e);
                     }
                 }
                 Collections.reverse(newcartlist);
+                Collections.reverse(keys);
                 mAdapter = new InboxHolder(ShowInbox.this, newcartlist);
                 mAdapter.setOnItemClickListener(ShowInbox.this);
                 recyclerView.setAdapter(mAdapter);
@@ -200,34 +215,27 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
 
     public void filter()
     {
-        userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
-        userReff.addValueEventListener(new ValueEventListener() {
+        keys.clear();
+        databaseReference.child("Unread").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot snapshot1: snapshot.getChildren())
                 {
                     if(snapshot1.exists())
                     {
-                        String val = snapshot1.getKey();
-                        boolean itsMe = false;
-                        if(uid.contains(snapshot1.getValue().toString()))
+                        Inbox myInbox = snapshot1.getValue(Inbox.class);
+                            sender = myInbox.getSender();
+                            String key = snapshot1.getKey();
+                            keys.add(key);
+                        if(!contactsList.contains(sender))
                         {
-                            itsMe = true;
-                            sender = val;
-                            contactsList.add("Me");
-                            contactsId.add(snapshot1.getValue().toString());
+                            contactsList.add(sender);
                             if(pos == 0)
                             {
-                               textView.setText(contactsList.get(0));
+                                textView.setText(contactsList.get(0));
                                 speak(contactsList.get(0));
                             }
                         }
-                        else if(!itsMe)
-                        {
-                            contactsList.add(val);
-                            contactsId.add(snapshot1.getValue().toString());
-                        }
-
                     }
 
                 }
@@ -247,34 +255,64 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (action == KeyEvent.ACTION_DOWN) {
-                    try{
-                        readPosition++;
-                        if(readPosition >  newcartlist.size())
-                        {
-                            readPosition = newcartlist.size();
-                        }
-                        read(readPosition);
-                    }
-                   catch (Exception e)
+                   if(newcartlist.isEmpty())
                    {
-                       System.out.println(e);
+                       next();
+                   }
+                   else if(newcartlist.size() == 1)
+                   {
+                       read(0);
+                       next();
+                   }
+                   else
+                   {
+                       try{
+                           readPosition++;
+                           if(readPosition >  newcartlist.size())
+                           {
+                               readPosition = -1;
+                               next();
+                           }
+                           read(0);
+                       }
+                       catch (Exception e)
+                       {
+                           System.out.println(e);
+                       }
                    }
                 }
                 return true;
             case KeyEvent.KEYCODE_VOLUME_UP:
                 if (action == KeyEvent.ACTION_DOWN) {
-                    try{
-                        readPosition --;
-                        if(readPosition < 0)
-                        {
-                            readPosition = 0;
-                        }
-                        read(readPosition);
-                    }
-                    catch (Exception e)
                     {
-                        System.out.println(e);
+                       if(newcartlist.isEmpty())
+                       {
+                           pre();
+                       }
+                       else if(newcartlist.size() == 1)
+                       {
+                           read(0);
+                           pre();
+                       }
+                       else
+                       {
+                           try{
+                               readPosition --;
+                               if(readPosition < 0)
+                               {
+                                   readPosition = 0;
+                                   pre();
+                               }
+                               read(readPosition);
+
+                           }
+                           catch (Exception e)
+                           {
+                               System.out.println(e);
+                           }
+                       }
                     }
+
                 }
                 return true;
             default:
@@ -324,15 +362,35 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
 
     }
 
-    public void read(int position)
-    {
-        vibrator.vibrate(150);
-        System.out.println("index:"+position);
-        Inbox myInbox1 = newcartlist.get(position);
-        String msg = myInbox1.getMsg();
-        String sender = myInbox1.getSender();
-        String receiveDate = myInbox1.getDate();
-        String receiveTime = myInbox1.getTime();
-        speak("Message is"+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
+    public void read(int position) {
+        try {
+                if (position > -1) {
+
+                    vibrator.vibrate(150);
+                    System.out.println("index:" + position);
+                    Inbox myInbox1 = newcartlist.get(position);
+                    String msg = myInbox1.getMsg();
+                    String sender = myInbox1.getSender();
+                    String receiveDate = myInbox1.getDate();
+                    String receiveTime = myInbox1.getTime();
+                    speak("Message is" + msg + " send by" + sender + " at " + receiveDate + "    " + receiveTime);
+                    try {
+                        TimeUnit.SECONDS.sleep(8);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    myInbox1.setStatus("Read");
+                    newcartlist.remove(position);
+                    newcartlist.clear();
+                    databaseReference.child("Unread").child(keys.get(position)).removeValue();
+                    databaseReference.child("Read").child(keys.get(position)).setValue(myInbox1);
+                }
+
+            }
+        catch (Exception e)
+        {
+            System.out.println(e);
+         }
+
     }
 }

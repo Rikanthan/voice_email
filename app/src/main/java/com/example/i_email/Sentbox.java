@@ -33,17 +33,28 @@ public class Sentbox {
         this.time = time;
     }
 
-    public Sentbox(String msg, String receiver, String date, String time) {
+    public Sentbox(String msg, String receiver, String date, String time,String status) {
         this.msg = msg;
         this.receiver = receiver;
         this.date = date;
         this.time = time;
+        this.status = status;
     }
 
     String msg;
     String receiver;
     String date;
     String time;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    String status;
 
     public Sentbox(){}
 }

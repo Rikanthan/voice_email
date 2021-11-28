@@ -35,16 +35,27 @@ public class Inbox {
 
 
 
-    public Inbox(String msg, String sender, String date, String time) {
+    public Inbox(String msg, String sender, String date, String time,String status) {
         this.msg = msg;
         this.sender = sender;
         this.date = date;
         this.time = time;
+        this.status = status;
     }
     String msg;
     String sender;
     String date;
     String time;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    String status;
     public Inbox(){}
 
 }

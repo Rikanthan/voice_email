@@ -92,7 +92,10 @@ public class Home extends AppCompatActivity{
                 Log.e("TTS", "Initialization failed");
             }
         });
-        speak("You are in write message page");
+        if(selectedUser != null)
+        {
+            speak("You are in write message page. You will send message to "+ selectedUser);
+        }
        // userReff = FirebaseDatabase.getInstance().getReference().child("UserID");
         reff = FirebaseDatabase.getInstance().getReference().child("User");
         final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -191,7 +194,8 @@ public class Home extends AppCompatActivity{
 
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
+            if (!(ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
                 Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                         Uri.parse("package:" + getPackageName()));
                 startActivity(intent);
