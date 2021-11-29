@@ -114,13 +114,13 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
 
     @Override
     public void onItemClick(int position) {
-        vibrator.vibrate(150);
-            Inbox myInbox1 = newcartlist.get(position);
-            String msg = myInbox1.getMsg();
-            String sender = myInbox1.getSender();
-            String receiveDate = myInbox1.getDate();
-            String receiveTime = myInbox1.getTime();
-            speak("Message is"+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
+//        vibrator.vibrate(150);
+//            Inbox myInbox1 = newcartlist.get(position);
+//            String msg = myInbox1.getMsg();
+//            String sender = myInbox1.getSender();
+//            String receiveDate = myInbox1.getDate();
+//            String receiveTime = myInbox1.getTime();
+//            speak("Message is"+msg +" send by"+sender+" at "+receiveDate+ "    "+ receiveTime);
     }
 
     @Override
@@ -177,10 +177,7 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
                 for(DataSnapshot dataSnapshot:snapshot.getChildren())
                 {
                     Inbox myInbox = dataSnapshot.getValue(Inbox.class);
-                    String msg = myInbox.getMsg();
                     String sender = myInbox.getSender();
-                    String receiveDate = myInbox.getDate();
-                    String receiveTime = myInbox.getTime();
                     try {
                         if(sender.equals(contactsList.get(pos))
                                 && myInbox.getStatus().equals("Unread")
@@ -191,7 +188,7 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
                         }
                         if(position == snapshot.getChildrenCount())
                         {
-                            speak("You have received new message ");
+                            speak("You have received new message from " + sender);
                         }
                     }
                     catch (Exception e)
@@ -255,64 +252,62 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (action == KeyEvent.ACTION_DOWN) {
-                   if(newcartlist.isEmpty())
-                   {
-                       next();
-                   }
-                   else if(newcartlist.size() == 1)
-                   {
-                       read(0);
-                       next();
-                   }
-                   else
-                   {
-                       try{
-                           readPosition++;
-                           if(readPosition >  newcartlist.size())
-                           {
-                               readPosition = -1;
-                               next();
-                           }
-                           read(0);
-                       }
-                       catch (Exception e)
-                       {
-                           System.out.println(e);
-                       }
-                   }
+                    if(newcartlist.isEmpty())
+                    {
+                        next();
+                    }
+                    else if(newcartlist.size() == 1)
+                    {
+                        read(0);
+                    }
+                    else
+                    {
+                        try {
+                            readPosition++;
+                            if(readPosition > newcartlist.size())
+                            {
+                                readPosition = -1;
+                                next();
+                            }
+                            else
+                            {
+
+                                read(readPosition);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            System.out.println(e);
+                        }
+                    }
+
                 }
                 return true;
             case KeyEvent.KEYCODE_VOLUME_UP:
                 if (action == KeyEvent.ACTION_DOWN) {
+                    if(newcartlist.isEmpty())
                     {
-                       if(newcartlist.isEmpty())
-                       {
-                           pre();
-                       }
-                       else if(newcartlist.size() == 1)
-                       {
-                           read(0);
-                           pre();
-                       }
-                       else
-                       {
-                           try{
-                               readPosition --;
-                               if(readPosition < 0)
-                               {
-                                   readPosition = 0;
-                                   pre();
-                               }
-                               read(readPosition);
-
-                           }
-                           catch (Exception e)
-                           {
-                               System.out.println(e);
-                           }
-                       }
+                        pre();
                     }
-
+                    else
+                    {
+                        try {
+                            readPosition--;
+                            if(readPosition < -1)
+                            {
+                                pre();
+                                readPosition = -1;
+                            }
+                            else
+                            {
+                                read(readPosition);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            System.out.println(e);
+                        }
+                    }
                 }
                 return true;
             default:
@@ -362,35 +357,20 @@ public class ShowInbox extends AppCompatActivity implements InboxHolder.OnItemCl
 
     }
 
-    public void read(int position) {
-        try {
-                if (position > -1) {
+    public void read(int readPosition) {
 
-                    vibrator.vibrate(150);
-                    System.out.println("index:" + position);
-                    Inbox myInbox1 = newcartlist.get(position);
-                    String msg = myInbox1.getMsg();
-                    String sender = myInbox1.getSender();
-                    String receiveDate = myInbox1.getDate();
-                    String receiveTime = myInbox1.getTime();
-                    speak("Message is" + msg + " send by" + sender + " at " + receiveDate + "    " + receiveTime);
-                    try {
-                        TimeUnit.SECONDS.sleep(8);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    myInbox1.setStatus("Read");
-                    newcartlist.remove(position);
-                    newcartlist.clear();
-                    databaseReference.child("Unread").child(keys.get(position)).removeValue();
-                    databaseReference.child("Read").child(keys.get(position)).setValue(myInbox1);
-                }
-
-            }
-        catch (Exception e)
+        if(readPosition > -1 )
         {
-            System.out.println(e);
-         }
-
+            vibrator.vibrate(150);
+            Inbox myInbox = newcartlist.get(readPosition);
+            String msg = myInbox.getMsg();
+            String receiver = myInbox.getSender();
+            String receiveDate = myInbox.getDate();
+            String receiveTime = myInbox.getTime();
+            speak("Message is"+msg +" send by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
+//            newcartlist.clear();
+//            databaseReference.child("Unread")
+//                    .child(receiveDate+" "+receiveTime).removeValue();
+        }
     }
 }

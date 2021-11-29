@@ -161,30 +161,7 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                 return super.onOptionsItemSelected(item);
         }
     }
-    public void read(int readPosition)  {
-        try {
-            if(readPosition > -1)
-            {
-                vibrator.vibrate(150);
-                Sentbox mySentbox = newcartlist.get(readPosition);
-                String msg = mySentbox.getMsg();
-                String receiver = mySentbox.getReceiver();
-                String receiveDate = mySentbox.getDate();
-                String receiveTime = mySentbox.getTime();
-                speak("Message is"+msg +" received by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
-                mySentbox.setStatus("Read");
-               // TimeUnit.SECONDS.sleep(8);
-                newcartlist.remove(readPosition);
-                newcartlist.clear();
-                databaseReference.child("Unread").child(keys.get(readPosition)).removeValue();
-                databaseReference.child("Read").child(keys.get(readPosition)).setValue(mySentbox);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e);
-        }
-    }
+
 
     public void show()
     {
@@ -196,9 +173,6 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                 {
                     Sentbox mySentbox = dataSnapshot.getValue(Sentbox.class);
                     String receiver = mySentbox.getReceiver();
-                    String msg = mySentbox.getMsg();
-                    String receiveDate = mySentbox.getDate();
-                    String receiveTime = mySentbox.getTime();
                     try {
                         if(receiver != null && receiver.equals(contactsList.get(pos)) &&
                                 mySentbox.getStatus().equals("Unread") &&
@@ -209,7 +183,7 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                         }
                         if(position == snapshot.getChildrenCount())
                         {
-                            speak("You have send new message");
+                            speak("You have send new message to "+receiver);
                         }
                     }
                     catch (Exception e)
@@ -276,6 +250,10 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                     {
                         next();
                     }
+                    else if(newcartlist.size() == 1)
+                    {
+                            read(0);
+                    }
                     else
                     {
                         try {
@@ -288,7 +266,7 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                             else
                             {
 
-                                read(0);
+                                read(readPosition);
                             }
                         }
                         catch (Exception e)
@@ -301,21 +279,28 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
                 return true;
             case KeyEvent.KEYCODE_VOLUME_UP:
                 if (action == KeyEvent.ACTION_DOWN) {
-                    try {
-                        readPosition--;
-                        if(readPosition < 0)
-                        {
-                            pre();
-                            readPosition = 0;
-                        }
-                        else
-                        {
-                            read(readPosition);
-                        }
-                    }
-                    catch (Exception e)
+                    if(newcartlist.isEmpty())
                     {
-                        System.out.println(e);
+                        pre();
+                    }
+                    else
+                    {
+                        try {
+                            readPosition--;
+                            if(readPosition < -1)
+                            {
+                                pre();
+                                readPosition = -1;
+                            }
+                            else
+                            {
+                                read(readPosition);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            System.out.println(e);
+                        }
                     }
                 }
                 return true;
@@ -364,5 +349,21 @@ public class ShowSentbox extends AppCompatActivity implements SentboxHolder.OnIt
     @Override
     public void onClick(View v) {
 
+    }
+    public void read(int readPosition) {
+
+        if(readPosition > -1 )
+        {
+            vibrator.vibrate(150);
+            Sentbox mySentbox = newcartlist.get(readPosition);
+            String msg = mySentbox.getMsg();
+            String receiver = mySentbox.getReceiver();
+            String receiveDate = mySentbox.getDate();
+            String receiveTime = mySentbox.getTime();
+            speak("Message is"+msg +" received by"+receiver+" at "+receiveDate+ "    "+ receiveTime);
+//            newcartlist.clear();
+//            databaseReference.child("Unread")
+//                    .child(receiveDate+" "+receiveTime).removeValue();
+        }
     }
 }
